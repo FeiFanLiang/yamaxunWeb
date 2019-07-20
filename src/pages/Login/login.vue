@@ -1,6 +1,6 @@
 <template>
   <section id="animation">
-    <div class="form-container" v-if="login" @keypress.enter="submit">
+    <div class="form-container" v-show="login" @keypress.enter="submit">
       <div class="form-header">
         <div class="log-img">
           <img src="../../../static/cc.png" alt />
@@ -42,7 +42,7 @@
         <Button type="text" @click="toggle">注册账号</Button>
       </div>
     </div>
-    <div class="form-container" v-if="!login" @keypress.enter="regist">
+    <div class="form-container" v-show="!login" @keypress.enter="regist">
       <Form ref="newUserForm" :model="newUserForm" class="form" :rules="new_rules">
         <Row type="flex" justify="center">
           <Col span="16">
@@ -152,10 +152,19 @@ export default {
 	},
     async submit() {
       if (this.form.username && this.form.password) {
-        const res = await userApi.login(form);
-        if (res.data.code === 0) {
-          this.$Message.error("用户名或密码错误！请检查您的输入");
-        }
+				userApi.login(this.form).then((res) => {
+					if(res.code === 0){
+						this.$Message.error("用户名或密码错误！请检查您的输入");
+					}else if(res.code == 1){
+						this.$router.push({
+							path:"/"
+						})
+					}
+				})
+        // const res = await userApi.login(form);
+        // if (res.data.code === 0) {
+        //   this.$Message.error("用户名或密码错误！请检查您的输入");
+        // }
       } else {
         this.$Message.error("用户名或密码不能为空");
       }
@@ -288,9 +297,11 @@ section {
     0.5818530743em -0.4783217245em 7px rgba(0, 173, 255, 0.9);
   animation-duration: 44s;
   animation-delay: -27s;
+
 }
 
 #animation::after {
+
   text-shadow: 1.8191120921em 0.6945916857em 7px rgba(147, 0, 255, 0.9),
     2.3027104219em -0.1014678049em 7px rgba(87, 255, 0, 0.9),
     1.6184184493em 1.77576573em 7px rgba(0, 81, 255, 0.9),

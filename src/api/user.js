@@ -1,25 +1,25 @@
-import axios from './request';
-
+import server from './request';
+console.log(server)
 export default {
-    async login(params){
-        return axios.request({
-            method:'post',
-            url:'/login',
-            FormData:params
+    async login(params) {
+        return server({
+            method: 'post',
+            url: '/login',
+            data: params
         })
     },
-    async logout(){
+    async logout() {
         return axios.request({
-            method:'get',
-            url:'/logout'
+            method: 'get',
+            url: '/logout'
         })
     },
-    async regist(params){
+    async regist(params) {
         return axios.request({
-            method:'get',
-            url:'/creatAccount',
-            FormData:params
+            method: 'get',
+            url: '/creatAccount',
+            FormData: params
         })
     }
-    
+
 }

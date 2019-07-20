@@ -13,18 +13,20 @@ Vue.use(iView)
 Vue.config.productionTip = false
 
 
-router.beforeEach((to,form,next) => {
-    // console.log(router.app.$cookies)
-    // debugger
-    if(!router.app.$cookies.isKey('__v') && to.path !== '/login'){
-        next({
-                    name:'登录页面'
-                })
-    }else{
+router.beforeEach((to, form, next) => {
+        // console.log(router.app.$cookies.isKey('__v'))
+        // console.log(router.app.$cookies.keys())
+        // console.log(document.cookie)
+        // if (!router.app.$cookies.isKey('__v') && to.path !== '/login') {
+        //     next({
+        //         name: '登录页面'
+        //     })
+        // } else {
+        //     next()
+        // }
         next()
-    }
-})
-/* eslint-disable no-new */
+    })
+    /* eslint-disable no-new */
 new Vue({
     el: '#app',
     router,
@@ -32,4 +34,3 @@ new Vue({
     components: { App },
     template: '<App/>'
 })
-
