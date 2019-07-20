@@ -161,10 +161,6 @@ export default {
 						})
 					}
 				})
-        // const res = await userApi.login(form);
-        // if (res.data.code === 0) {
-        //   this.$Message.error("用户名或密码错误！请检查您的输入");
-        // }
       } else {
         this.$Message.error("用户名或密码不能为空");
       }
