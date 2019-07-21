@@ -14,6 +14,9 @@ Vue.config.productionTip = false
 
 
 router.beforeEach((to, form, next) => {
+        if(!sessionStorage.getItem('user')){
+            const 
+        }
         // if (!router.app.$cookies.isKey('__v') && to.path !== '/login') {
         //     next({
         //         name: '登录页面'
