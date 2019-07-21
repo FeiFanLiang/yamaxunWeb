@@ -18,25 +18,20 @@
 		</Row>
 		<Row style="padding:20px" type="flex" justify="start">
 			<Col>
-				<Card title="系统公告" icon="ios-options" :padding="0" shadow style="width:400px;">
-           <p>欢迎您,超级管理员</p>
-        </Card>
-			</Col>
-			<Col>
 			 <div style="padding: 10px;background: #f8f8f9">
-        <Card title="个人面板" icon="ios-options" :padding="0" shadow style="width: 900px;">
+        <Card title="个人面板" icon="ios-options" :padding="0" shadow style="width: 300px;">
             <CellGroup>
 								<Cell title="用户名" label="comcdm"></Cell>
-                <Cell title="品牌信息" label="任天堂海外代购">
-									<Button type="text" slot="extra">编辑品牌</Button>
+                <Cell title="品牌信息" :label="userInfo.brand">
+									<Button type="text" slot="extra" @click="changeBand">编辑品牌</Button>
                 </Cell>
-                <Cell title="用户等级" label="超级管理员">
-									<Button type="text" slot="extra">用户管理</Button>
+                <Cell title="用户等级" :label="userInfo.roleLabel">
+									<Button type="text" slot="extra" v-if="userInfo.role" @click="subUserLink">用户管理</Button>
 								</Cell>
 								<Cell title="商品数量" label="20"/>
-								<Cell title="注册时间" label="2019-06-28"/>
+								<Cell title="注册时间" :label="userInfo.formatCreatTime"/>
 								<Cell title="密码管理">
-										<Button type="text" slot="extra">修改密码</Button>
+										<Button type="text" slot="extra" @click="changePass">修改密码</Button>
 								</Cell>
             </CellGroup>
         </Card>
@@ -44,31 +39,125 @@
 			</Col>
       
     </Row>
+	<Modal
+        v-model="modalShow"
+        :title="passwordChange?'修改密码':'修改品牌'"
+        :loading="loading"
+        @on-ok="submit">
+		<Form :model="form" ref="form" :rules="validRules">
+			<Row >
+				<Form-Item label="旧密码" prop="oldPass">
+				<Input type="password"  v-model="form.oldPass" placeholder="请输入旧密码"></Input>
+			</Form-Item>
+			<Form-Item label="新密码" prop="newPass">
+				<Input type="password" v-model="form.newPass" placeholder="请输入新密码"></Input>
+			</Form-Item>
+			</Row>
+			<Form-Item label="品牌名称" prop="newbrand">
+				<Input type="text" v-model="form.newbrand" placeholder="请输入新的品牌名称"></Input>
+			</Form-Item>
+		</Form>
+    </Modal>
 	</section>
 </template>
 <script>
+import {mapState} from 'vuex';
 export default {
+	
 	data(){
 		return { 
-						user:{
-							auth:'商家',
-							product:'美的空调'
-						},
-            animate: false, 
-            marqueeList: ['尊敬的用户您好','欢迎使用亚马逊后台管理系统','您可以发布修改查看您的商品'] 
+			animate: false,
+			modalShow:false,
+			passwordChange:false,
+			loading:true,
+			form:{
+				oldPass:'',
+				newPass:'',
+				newbrand:''
+			},
+			marqueeList: ['尊敬的用户您好','欢迎使用亚马逊后台管理系统','您可以发布修改查看您的商品'],
+			validRules:{
+				oldPass:[
+					{required:true,
+					message:'请输入您的密码',
+					trigger:'blur'},
+					{
+						type:'string',
+						min:6,
+						max:12,
+						message:'请输入6-12位密码'
+					}
+				],
+				newPass:[
+					{
+						required:true,
+						message:'请输入您的新密码',
+						trigger:'blur'
+					},
+					{
+						type:'string',
+						min:6,
+						max:12,
+						message:'请输入6-12位新密码'
+					}
+				],
+				newbrand:[
+					{
+						required:true,
+						message:'请输入您的品牌名称',
+						trigger:'blur'
+					},
+					{
+						type:'string',
+						min:1
+					}
+				]
+			}
         }
 	},
+	
 	created: function () { 
-            setInterval(this.showMarquee, 2000) 
-        }, 
+			setInterval(this.showMarquee, 2000)
+		},
+		computed:{
+			...mapState({
+				userInfo:state => state.userInfo
+			}),
+			
+		},
         methods: { 
-            showMarquee: function () { 
+			subUserLink(){
+				this.$router.push({
+					name:'用户管理'
+				})
+			},
+            showMarquee() { 
                 this.animate = true; 
                 setTimeout(()=>{ 
                     this.marqueeList.push(this.marqueeList[0]); 
                 this.marqueeList.shift(); 
                 this.animate = false; 
-            },500)}, 
+			},500)},
+			async submit(){
+				this.$refs['form'].validate((valid) => {
+					if(valid){
+						this.loading = true
+						this.loading = false
+					}else{
+						this.$Messgae.error('您填写的信息错误,请修改后提交')
+					}
+				})
+			},
+			changePass(){
+				this.modalShow = true
+				this.passwordChange=true
+				this.$refs['form'].resetFields()
+			},
+			changeBand(){
+				this.modalShow = true
+				this.passwordChange=false
+				this.$refs['form'].resetFields()
+			}
         } 
 }
 </script>

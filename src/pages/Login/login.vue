@@ -39,7 +39,7 @@
       </Form>
       <div class="form_submit">
         <Button type="success" long @click="submit">登录</Button>
-        <Button type="text" @click="toggle">注册账号</Button>
+        <Button type="text" @click="login=false">注册账号</Button>
       </div>
     </div>
     <div class="form-container" v-show="!login" @keypress.enter="regist">
@@ -88,13 +88,14 @@
         </Row>
       </Form>
       <div class="form_submit">
-        <Button type="success" long @click="regist('new_rules')">登录</Button>
-        <Button type="text" @click="login=false">已有账号？</Button>
+        <Button type="success" long @click="regist('newUserForm')">登录</Button>
+        <Button type="text" @click="login=true">已有账号？</Button>
       </div>
     </div>
   </section>
 </template>
 <script>
+import {mapMutations} from 'vuex';
 import { userApi } from "@/api";
 export default {
   data() {
@@ -145,17 +146,16 @@ export default {
     };
   },
   methods: {
-	toggle(){
-		this.$nextTick(() => {
-			this.login = false
-		})
-	},
+    ...mapMutations([
+      'updateUser'
+    ]),
     async submit() {
       if (this.form.username && this.form.password) {
 				userApi.login(this.form).then((res) => {
 					if(res.code === 0){
 						this.$Message.error("用户名或密码错误！请检查您的输入");
 					}else if(res.code == 1){
+            this.updateUser(res.data)
 						this.$router.push({
 							path:"/"
 						})
@@ -168,6 +168,15 @@ export default {
     async regist(name) {
       this.$refs[name].validate(valid => {
         if (valid) {
+          userApi.regist(this.newUserForm).then((res) => {
+            if(res.code === 1){
+              this.$Message.success('注册成功！')
+              this.login = true
+            }else if(res.code === 0){
+              this.$Message.success(res.data)
+            }
+            
+          })
         } else {
           this.$Message.error("您的输入信息有误,请检查后重试");
         }

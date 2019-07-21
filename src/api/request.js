@@ -17,10 +17,10 @@ server.interceptors.response.use((response) => {
         })
         return
     }
-    if (response.data.code === 0) {
-        this.$Message.error('请求失败')
-        return
-    }
+    // if (response.data.code === 0) {
+    //     this.$Message.error('请求失败')
+    //     return
+    // }
     if (response.data.code === 400) {
         this.$Message.error('您没有权限操作')
         return

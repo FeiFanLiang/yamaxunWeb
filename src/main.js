@@ -14,9 +14,6 @@ Vue.config.productionTip = false
 
 
 router.beforeEach((to, form, next) => {
-        // console.log(router.app.$cookies.isKey('__v'))
-        // console.log(router.app.$cookies.keys())
-        // console.log(document.cookie)
         // if (!router.app.$cookies.isKey('__v') && to.path !== '/login') {
         //     next({
         //         name: '登录页面'
@@ -25,6 +22,7 @@ router.beforeEach((to, form, next) => {
         //     next()
         // }
         next()
+       
     })
     /* eslint-disable no-new */
 new Vue({

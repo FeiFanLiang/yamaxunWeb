@@ -5,8 +5,28 @@
 </template>
 
 <script>
+import {mapMutations} from 'vuex'
+import {userApi} from '@/api'
 export default {
-  name: 'App'
+  name: 'App',
+  mounted(){
+    this.getUser()
+  },
+  
+  methods:{
+    ...mapMutations(['updateUser']),
+    async getUser(){
+      const userInfo = JSON.parse(sessionStorage.getItem('user'))
+    if(userInfo){
+      this.updateUser(userInfo)
+    }else{
+      const res = await userApi.userInfo()
+      debugger
+      sessionStorage.setItem('user',JSON.stringify(res.data))
+      this.updateUser(res.data)
+    }
+    }
+  }
 }
 </script>
 

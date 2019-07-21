@@ -1,8 +1,8 @@
-import server from './request';
-console.log(server)
+import axios from './request';
+
 export default {
     async login(params) {
-        return server({
+        return axios({
             method: 'post',
             url: '/login',
             data: params
@@ -15,10 +15,16 @@ export default {
         })
     },
     async regist(params) {
-        return axios.request({
-            method: 'get',
+        return axios({
+            method: 'post',
             url: '/creatAccount',
-            FormData: params
+            data: params
+        })
+    },
+    async userInfo(){
+        return axios({
+            method:'get',
+            url:'/userInfo'
         })
     }
 
