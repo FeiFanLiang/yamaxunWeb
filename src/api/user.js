@@ -21,10 +21,23 @@ export default {
             data: params
         })
     },
-    async userInfo(){
+    async userInfo() {
         return axios({
-            method:'get',
-            url:'/userInfo'
+            method: 'get',
+            url: '/userInfo'
+        })
+    },
+    async updateUser(params) {
+        return axios({
+            method: 'post',
+            url: '/updateUser',
+            data: params
+        })
+    },
+    async getSubUser() {
+        return axios({
+            method: 'get',
+            url: '/getSubUserList'
         })
     }
 
