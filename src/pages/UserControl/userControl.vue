@@ -2,17 +2,17 @@
   <section>
     <Row>
       <Col :span="4">
-      <span>您的用户等级为 {{userInfo.role}}</span>
-      <span>最多添加{{userInfo.creatLimit}}个用户,当前添加{{userInfo.creatNumber}}</span>
+      <span>您的用户等级为 {{userInfo.roleLabel}} </span>
+      <span>最多添加{{userInfo.creatLimit}}个用户 当前添加{{userInfo.creatNumber}}</span>
       </Col>
     </Row>
     <br>
     <Row :gutter="12">
       <Col :span="1">
-      <Button type="success" size="small">添加用户</Button>
+      <Button type="success" size="small" @click="add">添加用户</Button>
       </Col>
       <Col :span="1">
-      <Button type="error" size="small">批量删除</Button>
+      <Button type="error" size="small" @click="del">批量删除</Button>
       </Col>
     </Row>
     <br>
@@ -21,8 +21,8 @@
         <strong>{{ row.name }}</strong>
       </template>
       <template slot-scope="{ row, index }" slot="action">
-        <Button type="primary" size="small" style="margin-right: 5px" @click="show(index)">View</Button>
-        <Button type="error" size="small" @click="remove(index)">Delete</Button>
+        <Button type="primary" size="small" style="margin-right: 5px" @click="edit(row,index)">编辑</Button>
+        <Button type="error" size="small" @click="remove(index)">删除</Button>
       </template>
     </Table>
 		<Modal
@@ -31,19 +31,80 @@
 			:loading="loading"
 			@on-ok="submit"
 			>
-			
+      <template v-if="addUser">
+        <Form :model="newUser" ref="newForm" :rules="validRules">
+          <Form-Item label="用户名" prop="username">
+            <Input v-model="newUser.username" type="text" placeholder="用户名"></Input>
+          </Form-Item>
+          <Form-Item label="密码" prop="password">
+            <Input v-model="newUser.password" type="text" placeholder="密码"></Input>
+          </Form-Item>
+          <Form-Item label="品牌名称" prop="brand">
+            <Input v-model="newUser.brand" type="text" placeholder="品牌"></Input>
+          </Form-Item>
+        </Form>
+      </template>
+      <template v-else>
+      <Form :model="editUser" ref="editForm" :rules="validRules">
+          <Form-Item label="用户名">
+            <Input v-model="newUser.username" type="text" placeholder="用户名" disabled></Input>
+          </Form-Item>
+          <Form-Item label="密码" prop="password">
+            <Input v-model="newUser.password" type="text" placeholder="密码"></Input>
+          </Form-Item>
+          <Form-Item label="品牌名称" prop="brand">
+            <Input v-model="newUser.brand" type="text" placeholder="品牌"></Input>
+          </Form-Item>
+        </Form>
+      </template>
+			<Form>
+        
+      </Form>
 		</Modal>
 		
   </section>
 </template>
 <script>
-  import { mapGetters } from "vuex";
+
+  import { mapGetters, mapState } from "vuex";
   import { userApi } from "@/api";
   export default {
     data() {
       return {
+        loading:false,
 				modelShow:false,
-				addUser:true,
+        addUser:true,
+        newUser:{
+          username:"",
+          password:'',
+          brand:''
+        },
+        editUser:{
+          username:'',
+          password:"",
+          brand:"",
+          auth:true
+        },
+          validRules: {
+            username:[
+              {required:true,message:"请输入用户名",trigger:'blur'}
+            ],
+            password:[
+              {required:true,message:'请输入密码',trigger:'blur'}
+            ],
+         
+          brand: [
+            {
+              required: true,
+              message: "请输入品牌名称",
+              trigger: "blur"
+            },
+            {
+              type: "string",
+              min: 1
+            }
+          ]
+        },
         columns12: [
           {
             type: "selection",
@@ -95,7 +156,7 @@
       };
     },
     computed: {
-      ...mapGetters({
+      ...mapState({
         userInfo: state => state.userInfo
       })
     },
@@ -103,19 +164,54 @@
       this.getSubUser();
     },
     methods: {
-      show(index) {
-        this.$Modal.info({
-          title: "User Info",
-          content: `Name：${this.data6[index].name}<br>Age：${this.data6[index].age}<br>Address：${this.data6[index].address}`
-        });
+      async add(){
+        this.addUser = true;
+        this.modelShow = true;
+        
+        
       },
-      remove(index) {
-        this.data6.splice(index, 1);
+      async del(){
+        
+      },
+     
+      edit(row,index) {
+        debugger
+        this.editUser = row
+        this.addUser = false
+        this.modelShow = true
+      },
+      remove(row,index) {
+        const params = {
+          username:row.username
+        }
+        userApi.deletUserFromAuth(params).then((res) => {
+          this.data6.splice(index, 1);
+          this.$Message.success('删除成功')
+        })
       },
       getSubUser() {
         userApi.getSubUser().then(data => {
           this.userList = data;
         });
+      },
+      async submit(){
+        let name,form
+        if(this.addUser){
+          name = 'newForm'
+          form = this.newUser
+        } else{
+          name = 'editForm'
+          form = this.editUser
+        }
+        this.$refs[name].validate((valid) => {
+          if(valid){
+            userApi.updateUserFromAuth(form).then((res) => {
+              this.$Message.success('操作成功')
+            })
+          }else{
+
+          }
+        })
       }
     }
   };

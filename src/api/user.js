@@ -39,6 +39,27 @@ export default {
             method: 'get',
             url: '/getSubUserList'
         })
+    },
+    async deletUserFromAuth(params){
+        return axios({
+            method:'get',
+            url:'/deleteUser',
+            params
+        })
+    },
+    async creatNewUserFromAuth(params){
+        return axios({
+            method:'post',
+            url:'/creatAccountFromAuth',
+            data:params
+        })
+    },
+    async updateUserFromAuth(params){
+        return axios({
+            method:'post',
+            url:'/updateUserFromAuth',
+            data:params
+        })
     }
 
 }
