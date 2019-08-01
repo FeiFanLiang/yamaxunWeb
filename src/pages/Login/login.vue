@@ -88,7 +88,7 @@
         </Row>
       </Form>
       <div class="form_submit">
-        <Button type="success" long @click="regist('newUserForm')">登录</Button>
+        <Button type="success" long @click="regist('newUserForm')">注册</Button>
         <Button type="text" @click="login=true">已有账号？</Button>
       </div>
     </div>
@@ -155,7 +155,7 @@ export default {
 					if(res.code === 0){
 						this.$Message.error("用户名或密码错误！请检查您的输入");
 					}else if(res.code == 1){
-            this.updateUser(res.data)
+            this.updateInfo()
 						this.$router.push({
 							path:"/"
 						})
@@ -164,6 +164,11 @@ export default {
       } else {
         this.$Message.error("用户名或密码不能为空");
       }
+    },
+    async updateInfo(){
+      const res2 = await userApi.userInfo()
+      sessionStorage.setItem('user',JSON.stringify(res2.data))
+      this.updateUser(res2.data)
     },
     async regist(name) {
       this.$refs[name].validate(valid => {

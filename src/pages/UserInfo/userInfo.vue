@@ -21,14 +21,14 @@
       <div style="padding: 10px;background: #f8f8f9">
         <Card title="个人面板" icon="ios-options" :padding="0" shadow style="width: 300px;">
           <CellGroup>
-            <Cell title="用户名" label="comcdm"></Cell>
+            <Cell title="用户名" :label="userInfo.username"></Cell>
             <Cell title="品牌信息" :label="userInfo.brand">
               <Button type="text" slot="extra" @click="changeBand">编辑品牌</Button>
             </Cell>
             <Cell title="用户等级" :label="userInfo.roleLabel">
               <Button type="text" slot="extra" v-if="userInfo.role" @click="subUserLink">用户管理</Button>
             </Cell>
-            <Cell title="商品数量" label="20" />
+            <!-- <Cell title="商品数量" label="20" /> -->
             <Cell title="注册时间" :label="userInfo.formatCreatTime" />
             <Cell title="密码管理">
               <Button type="text" slot="extra" @click="changePass">修改密码</Button>
@@ -50,8 +50,8 @@
           </Form-Item>
         </Row>
         <Row v-else>
-          <Form-Item label="品牌名称" prop="newbrand">
-            <Input type="text" v-model="form.newbrand" placeholder="请输入新的品牌名称"></Input>
+          <Form-Item label="品牌名称" prop="newBrand">
+            <Input type="text" v-model="form.newBrand" placeholder="请输入新的品牌名称"></Input>
           </Form-Item>
         </Row>
 
@@ -60,7 +60,7 @@
   </section>
 </template>
 <script>
-  import { mapState } from "vuex";
+  import { mapState,mapMutations } from "vuex";
   import { userApi } from "@/api";
   export default {
     data() {
@@ -72,7 +72,7 @@
         form: {
           oldPass: "",
           newPass: "",
-          newbrand: "",
+          newBrand: "",
           isPass: false
         },
         marqueeList: [
@@ -103,7 +103,7 @@
               message: "请输入6-12位新密码"
             }
           ],
-          newbrand: [
+          newBrand: [
             {
               required: true,
               message: "请输入您的品牌名称",
@@ -127,6 +127,7 @@
       })
     },
     methods: {
+      ...mapMutations(['updateUser']),
       subUserLink() {
         this.$router.push({
           name: "用户管理"
@@ -144,7 +145,16 @@
         this.$refs["form"].validate(async valid => {
           if (valid) {
             this.loading = true;
-            await userApi.updateUser(this.form);
+            let res = await userApi.updateUser(this.form);
+            if(res.code){
+              this.$Message.success('修改成功')
+              const res = await userApi.userInfo()
+              sessionStorage.setItem('user',JSON.stringify(res.data))
+              this.updateUser(res.data)
+              this.modalShow = false
+            }else{
+              this.$Message.error(res.data)
+            }
             this.loading = false;
           } else {
             this.$Messgae.error("您填写的信息错误,请修改后提交");

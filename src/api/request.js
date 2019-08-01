@@ -30,7 +30,7 @@ server.interceptors.response.use((response) => {
 }, (error) => {
     console.log(error)
     Message.error(`您的请求失败`)
-    Promise.reject(error)
+   // Promise.reject(error)
 })
 
 export default server

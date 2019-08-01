@@ -32,7 +32,7 @@ export default new Router({
                     name: '用户管理',
                     path: 'admin',
                     meta: {
-                        level: []
+                        level: [1]
                     },
                     component: () =>
                         import ('@/pages/UserControl/userControl')
@@ -51,9 +51,16 @@ export default new Router({
             children: [{
                 name: '我的商品',
                 path: 'myCommit',
+                meta:{},
                 component: () =>
                     import ('@/pages/Merchan/merchan')
-            }, ]
+            }, 
+        {
+            name:'商品编辑',
+            path:'editCommit',
+            meta:{},
+            component: () => import('@/pages/Newchan/newchan')
+        }]
         },
         {
             name: '登录页面',

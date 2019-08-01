@@ -21,7 +21,6 @@ export default {
       this.updateUser(userInfo)
     }else{
       const res = await userApi.userInfo()
-      debugger
       sessionStorage.setItem('user',JSON.stringify(res.data))
       this.updateUser(res.data)
     }
@@ -34,4 +33,7 @@ export default {
 	#app{
 		height: 100%;
 	}
+  #app .ivu-layout-content{
+    background: none !important;
+  }
 </style>

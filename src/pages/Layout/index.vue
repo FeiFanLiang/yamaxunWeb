@@ -9,9 +9,13 @@
 											</div>
 											<span class="logo-title">亚马逊通跨境电商</span>
 										</div>
-                    <!-- <div class="layout-nav">
-											<MenuItem to="{path:'/dashboard',name:'个人中心'}" name="个人中心">个人中心</MenuItem>
-                    </div> -->
+                    <div class="userInfo">
+						
+						{{userInfo.username}}
+						
+							<Button type="text" @click="logout">注销</Button>
+						
+					</div>
                 </Menu>
             </Header>
             <Layout>
@@ -24,8 +28,10 @@
                       <template slot="title">
 											{{item.name}}		
 											</template>
-                    
-										<MenuItem v-for="route in item.children" :name="route.name" :to="route" :key="route.name">{{route.name}}</MenuItem>
+										<template v-for="route in item.children">
+											<MenuItem  :name="route.name" :to="route" :key="route.name" v-if="!route.meta.level || route.meta.level <= userInfo.role">{{route.name}}</MenuItem>	
+										</template>
+										
 										</Submenu>
                     </Menu>
                 </Sider>
@@ -45,6 +51,8 @@
     </div>
 </template>
 <script>
+import {mapState} from "vuex"
+import{userApi} from '@/api'
 export default {
 	data(){
 		return {
@@ -55,8 +63,11 @@ export default {
 	
 	},
 	computed:{
+		...mapState({
+        userInfo: state => state.userInfo
+      }),
 		router(){
-			return this.$router.options.routes.filter(el => el.meta && !el.meta.hidden)
+			return this.$router.options.routes.filter(el =>  el.meta && !el.meta.hidden)
 		},
 		breadRoutes(){
 			return this.$route.matched.filter(el => el.meta && !el.meta.bread)
@@ -64,6 +75,14 @@ export default {
 	},
 	mounted(){
 	//	console.log(this.$cookies)
+	},
+	methods:{
+		async logout(){
+			await userApi.logout()
+			this.$router.push({
+				name:'登录页面'
+			})
+		}
 	}
 }
 </script>
@@ -98,6 +117,10 @@ export default {
 		.logo-title{
 			color: #ef810b;
 		}
+}
+.userInfo{
+	width: 200px;
+	float: right;
 }
 .layout-nav{
     width: 420px;

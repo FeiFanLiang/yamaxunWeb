@@ -1,5 +1,8 @@
 import userApi from './user'
-
+import categoryApi from './categotry'
+import merchan from './merchan'
 export {
-    userApi
+    userApi,
+    categoryApi,
+    merchan
 }
