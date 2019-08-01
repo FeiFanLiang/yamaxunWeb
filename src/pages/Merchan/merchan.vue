@@ -133,14 +133,12 @@ export default {
               }
               return merchan.deleteMer(params)
           })
-          debugger
+         
           await Promise.all(promiseArr)
-          this.getMerList()
-          
+          this.getMerList()         
       },
       bathSelect(val){
           this.selectArr = val
-          debugger
       },
       addNew(){
           this.$router.push({

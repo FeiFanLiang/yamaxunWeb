@@ -219,8 +219,6 @@
       },
      
       edit(row,index) {
-        console.log(row)
-      //  this.editUser = row
         for(let i in row){
           if(i && this.editUser[i] !== undefined){
             this.editUser[i] = row[i]

@@ -59,9 +59,6 @@ export default {
 
 		}
 	},
-	watch:{
-	
-	},
 	computed:{
 		...mapState({
         userInfo: state => state.userInfo
