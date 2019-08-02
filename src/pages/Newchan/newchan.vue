@@ -6,13 +6,41 @@
           <div class="tab_wrap">
             <Row>
               <Col :span="5">
-                <FormItem label="店铺名称">
+                <FormItem label="品牌名称">
                   <Input v-model="form.brand" disabled></Input>
                 </FormItem>
               </Col>
             </Row>
-
-            <Form-Item label="站点选择" prop="country">
+            <template v-if="EditShow">
+              <div class="edit-item">属性分类信息</div>
+              <div class="edit-item">
+                发布站点:{{form.country}}
+              </div>
+              <div class="edit-item">
+                分类目录:{{form.categoryType}}
+              </div>
+             
+              <div v-if="form.childAttr.length">
+                <span class="edit-item">变种信息展示</span>
+                <template v-for="(item,index) in form.childAttr">
+                  <Row v-if="index===0" :key="item.sku">
+                    <Col v-if="key !== '__id'" :span="2" v-for="(value,key,i) in item" :key="i">
+                      <span class="attrForm-item-show">{{key}}</span>
+                    </Col>
+                  </Row>
+                  <Row style="margin:10px 0;">
+                    <Col :span="2" v-if="key !== '__id'" v-for="(value,key,i) in item" :key="i">
+                      <span class="attrForm-item-show">{{value}}</span>
+                    </Col>
+                  </Row>
+                </template>
+              </div>
+            </template>
+            <Row>
+              <Button v-if="EditShow" @click="resertEdit" type="primary">修改分类信息</Button>
+            </Row>
+            <template v-if="!EditShow">
+              <Form-Item label="站点选择" prop="country">
               <Select
                 v-model="form.country"
                 style="width:200px"
@@ -34,7 +62,6 @@
                 @on-change="cascaderSel"
                 width="200px"
               ></Cascader>
-              
             </Form-Item>
             <Form-Item label="分类类型" v-if="hasCategoryTypesCheck">
               <Select v-model="form.categoryTypesCheck" @on-change="categoryTypesCheckChange">
@@ -50,6 +77,7 @@
                 </RadioGroup>
               </Row>
             </Form-Item>
+
             <Form-Item label="变种信息" v-if="form.hasVarieta">
               <Row>
                 <Select v-model="form.VariType" @on-change="variTypeChange">
@@ -104,7 +132,7 @@
                     <div v-if="item.addValues && item.addValues.length">
                       <Tag
                         v-for="(el,index) in item.addValues"
-                        :key="el" 
+                        :key="el"
                         closable
                         @on-close="handleClose(item,index)"
                       >{{el}}</Tag>
@@ -127,52 +155,57 @@
                   <Button size="small" @click="modalAddAttrSelectShow(item)">添加</Button>
                 </Col>
               </Row>
+
               <Row v-if="childAttrFormShow" class="attrBtn-wrap">
                 <Button type="success" size="small" @click="initChildAttrForm">生成变种子类型</Button>
               </Row>
-              <Row>
-                <div>变种类目编辑</div>
-                <Table
-                  ref="childAttr"
-                  border
-                  :columns="childAttrFormColumns"
-                  :data="form.childAttr"
-                >
-                  <template
-                    v-for="(value,key,i) in form.childAttr[0]"
-                    slot-scope="{ row,index}"
-                    :slot="key"
-                  >
-                    <div v-if="key=='discountDate'" :key="i">
+
+              <div>变种类目编辑</div>
+              <template v-for="(item,index) in form.childAttr" v-if="form.childAttr.length">
+                <Row v-if="index===0" :key="item.sku">
+                  <Col v-if="key !== '__id'" :span="2" v-for="(value,key,i) in item" :key="i">
+                    <span class="attrForm-item">{{key}}</span>
+                  </Col>
+                  <Col :span="2">
+                    <span class="attrForm-item">操作</span>
+                  </Col>
+                </Row>
+                <Row style="margin:10px 0;">
+                  <Col :span="2" v-if="key !== '__id'" v-for="(value,key,i) in item" :key="i">
+                    
+                    <span class="attrForm-item">
                       <DatePicker
                         type="daterange"
-                        @on-change="childAttrDiscountDate(row,$event)"
+                        @on-change="childAttrDiscountDate(item,$event)"
                         formate="yyyy-MM-dd"
                         placement="bottom-end"
                         placeholder="Select date"
-                        style="width: 200px"
+                        style="width: 150px"
+                        v-if="key=='discountDate'"
+                        :key="i"
                       ></DatePicker>
-                    </div>
-                    <div v-else :key="i">
                       <Input
-                        v-model="row[key]"
-                        v-if="!value"
-                        :key="key"
+                        style="width:150px"
+                        v-else
+                        v-model="item[key]"
+                        :disabled="attrTypesNoEdit[key]||key== 'sku'"
                       ></Input>
-                      <div v-else :key="key">{{row[key]}}</div>
-                    </div>
-                  </template>
-
-                  <template slot-scope="{ row, index }" slot="action">
-                    <Button type="error" size="small" @click="delChildAttr(index)">移除</Button>
-                  </template>
-                </Table>
-              </Row>
+                     
+                    </span>
+                  </Col>
+                  <Col :span="2">
+                    <span class="attrForm-item">
+                      <Button type="error" size="small" @click="delChildAttr(index)">移除</Button>
+                    </span>
+                  </Col>
+                </Row>
+              </template>
             </template>
-            <Row></Row>
+            </template>
+            
 
             <FormItem label="ParentSKU" prop="parentSku">
-              <Input v-model="form.parentSku" placeholder="必填项,商品SKU"></Input>
+              <Input v-model="form.parentSku" disabled></Input>
             </FormItem>
 
             <Row>
@@ -193,11 +226,7 @@
                 <Input v-model="form.price" placeholder="商品价格"></Input>
               </FormItem>
             </Row>
-            <Row>
-              <!-- <FormItem label="商品目录">
-              <Input v-model.number="form.commkey" placeholder="商品目录"></Input>
-              </FormItem>-->
-            </Row>
+           
             <Row>
               <FormItem label="关键词" prop="keyword">
                 <Input v-model.number="form.keyword" placeholder="请输入关键词,不能超过250字符"></Input>
@@ -229,7 +258,7 @@
         </TabPane>
         <TabPane label="描述信息" name="描述信息">
           <Form-Item label="促销价格">
-            <Input type="text" v-model="form.discountPrice"  placeholder="0.00"></Input>
+            <Input type="text" v-model="form.discountPrice" placeholder="0.00"></Input>
           </Form-Item>
 
           <Form-Item label="促销日期">
@@ -342,7 +371,7 @@
               style="width: 100%"
             />
           </Modal>
-        </TabPane> -->
+        </TabPane>-->
       </Tabs>
     </Form>
     <div>
@@ -352,7 +381,7 @@
   </section>
 </template>
 <script>
-import { categoryApi,merchan } from "@/api";
+import { categoryApi, merchan } from "@/api";
 import { regions, comStatusOptions, attrData } from "@/common/options.js";
 export default {
   //quantity //title //id //keyword
@@ -360,9 +389,7 @@ export default {
     return {
       comStatusOptions: comStatusOptions,
       regions: regions,
-      regionId: "",
-      regionClass: "",
-      categoryTypeLabel: "",
+      EditShow:false,
       currentRegion: {
         options: [
           {
@@ -380,6 +407,7 @@ export default {
         skuThemeAttr: "",
         skuAttTheme: ""
       },
+      
       //当前选择的属性下变种
       currentCategoryChildAttr: [],
       //当前选择变种属性下拉框
@@ -392,18 +420,25 @@ export default {
       attrTypeSelect: "",
       //当前选择的select类型变种子属性值
       attrTypeSelectValue: "",
-      sold: "",
-      
+      attrTypesNoEdit:{},
+      defalutAttrObj: {
+        sku: "",
+        conditionNote: "",
+        price: "",
+        discountPrice: "",
+        discountDate: "",
+        quantity: ""
+      },
       hasCategoryTypesCheck: false,
       categoryTypesCheckOptions: [],
       currentSite: "",
       spinShow: false,
       arrInputModal: false,
       arrSelectModal: false,
-      childAttrFormShow: false,
+      childAttrFormShow: true,
       childAttrFormColumns: [],
       form: {
-        brand:'德国乐她美专卖',
+        brand: "德国乐她美专卖",
         country: "",
         categoryType: "",
         parentSku: "",
@@ -448,46 +483,55 @@ export default {
       visible: false,
       uploadList: [],
       ruleValidate: {
-        point1:[
-          {required:true,
-          message:'请输入50字以内的商品重点描述',
-          trigger:'blur'}
-        ],
-         point2:[
-          {required:true,
-          message:'请输入50字以内的商品重点描述',
-          trigger:'blur'}
-        ],
-         point3:[
-          {required:true,
-          message:'请输入50字以内的商品重点描述',
-          trigger:'blur'}
-        ],
-         point4:[
-          {required:true,
-          message:'请输入50字以内的商品重点描述',
-          trigger:'blur'}
-        ],
-         point5:[
-          {required:true,
-          message:'请输入50字以内的商品重点描述',
-          trigger:'blur'}
-        ],
-        quantity:[
+        point1: [
           {
-            required:true,
-            message:'请输出产品数量',
-            trigger:'blur',
-            type:'number'
+            required: true,
+            message: "请输入50字以内的商品重点描述",
+            trigger: "blur"
           }
         ],
-        parentSku:[
+        point2: [
           {
-            required:true,
-            message:'请输入产品sku',
-            trigger:'blur'
+            required: true,
+            message: "请输入50字以内的商品重点描述",
+            trigger: "blur"
           }
-
+        ],
+        point3: [
+          {
+            required: true,
+            message: "请输入50字以内的商品重点描述",
+            trigger: "blur"
+          }
+        ],
+        point4: [
+          {
+            required: true,
+            message: "请输入50字以内的商品重点描述",
+            trigger: "blur"
+          }
+        ],
+        point5: [
+          {
+            required: true,
+            message: "请输入50字以内的商品重点描述",
+            trigger: "blur"
+          }
+        ],
+        quantity: [
+          {
+            required: true,
+            message: "请输出产品数量",
+            trigger: "blur",
+            type: "number"
+          }
+        ],
+        parentSku: [
+          {
+            required: true,
+            message: "请输入产品sku",
+            trigger: "blur"
+          }
         ],
         price: [
           {
@@ -525,7 +569,7 @@ export default {
             required: true,
             message: "请输入商品ID",
             trigger: "blur"
-          },
+          }
         ],
         description: [
           {
@@ -540,63 +584,76 @@ export default {
             trigger: "blur"
           }
         ],
-        country:[
-          { type:'string',
-            required:true,
-            message:'请选择站点',
-            trigger:'change',
-
-          },
-
-        ],
-        categoryType:[
+        country: [
           {
-            required:true,
-            message:'请选择分类',
-            trigger:'change',
-            type:'string'
+            type: "string",
+            required: true,
+            message: "请选择站点",
+            trigger: "change"
+          }
+        ],
+        categoryType: [
+          {
+            required: true,
+            message: "请选择分类",
+            trigger: "change",
+            type: "string"
           }
         ]
       }
     };
   },
-  computed: {
-    
+  computed: {},
+  created() {
+    this.fetchData();
   },
-  created(){
-    this.fetchData()
-  },
-  
+
   methods: {
-    fetchData(){
-      
-      if(this.$route.query.edit){
-        sessionStorage.getItem('currentMer')
-        this.form = JSON.parse(sessionStorage.getItem('currentMer'))
+    resertEdit(){
+      this.EditShow = false
+      this.form.country = ''
+      this.form.childAttr = []
+      this.form.hasVarieta = 0
+
+    },
+    fetchData() {
+      if (this.$route.query.edit) {
+        sessionStorage.getItem("currentMer");
+        this.form = JSON.parse(sessionStorage.getItem("currentMer"));
+        this.EditShow = true
+      }else{
+        this.form.parentSku = this.form.brand+'-'+this.$uuid()
       }
     },
-    async addSubmit(){
-    const childAttr =  this.$refs['childAttr'].rebuildData.map(el => {
-        delete el['_rowKey']
-        delete el['_index']
-        return el
-      })
-      this.form.childAttr = childAttr 
-      this.$refs['newCommitFrom'].validate((valid) => {
-        if(valid){
-          merchan.addMer(this.form).then((res) => {
-      })
-        }else{
-          this.$Message.error('您的信息填写有误，请检查后重新提交')
-        }
-      })
+
+    async addSubmit() {
       
+      this.$refs["newCommitFrom"].validate(valid => {
+        if (valid) {
+          if(this.$route.query.edit){
+        merchan.updateMer(this.form).then((res) => {
+          if(res.code == 0){
+            this.$Message.success('修改成功')
+          }else{
+            this.$Message.error("修改失败");
+          }
+        })
+      }else{
+         merchan.addMer(this.form).then(res => {
+            if(res.code == 0){
+              this.$Message.success('发布成功')
+            }else{
+              this.$Message.error("发布失败");
+            }
+          });
+      }
+         
+        } else {
+          this.$Message.error("您的信息填写有误，请检查后重新提交");
+        }
+      });
     },
-    
-    saveChildColumn(row) {
-      this.$refs['childAttr'].rebuildData
-    },
-    
+
     childAttrDiscountDate(item, date) {
       item.discountDate = date;
     },
@@ -608,7 +665,7 @@ export default {
       const skuEndemicAttr = this.currentCategoryAttr.skuEndemicAttr;
 
       let obj = {
-        sku: "",
+        sku: '',
         conditionNote: "",
         price: "",
         discountPrice: "",
@@ -626,6 +683,8 @@ export default {
             name: skuAttThemeArr[key].attributeName,
             values: skuAttThemeArr[key].addValues
           };
+          this.attrTypesNoEdit[skuAttThemeArr[key].attributeName] = true
+          console.log(this.attrTypesNoEdit)
           childAttr.push(attrObj);
         }
       }
@@ -633,6 +692,7 @@ export default {
         skuEndemicAttr.forEach(endemic => {
           if (obj[endemic.attributeName] == undefined) {
             obj[endemic.attributeName] = "";
+            
           }
         });
       }
@@ -648,36 +708,23 @@ export default {
           });
         } else {
           let currentArr = [];
-          item.values.forEach(el => {
+          item.values.forEach((el,index) => {
             resultArray.forEach(result => {
               let obj = {};
               obj[item.name] = el;
-
               currentArr.push(Object.assign({}, obj, result));
             });
           });
           resultArray = currentArr;
         }
       });
-      resultArray.forEach(el => {
+      resultArray.forEach((el,index) => {
         let initObj = Object.assign({}, obj, el);
+        let currentindex = index<9?'0'+(index+1) : (index+1)
+        initObj.sku = `${this.form.parentSku}-${currentindex}`
         childChanList.push(initObj);
       });
       this.form.childAttr = childChanList;
-      const childAttrFormColumns = [];
-
-      for (let key in childChanList[0]) {
-        let obj = {
-          title: key,
-          slot: key
-        };
-        childAttrFormColumns.push(obj);
-      }
-      childAttrFormColumns.push({
-        title: "操作",
-        slot: "action"
-      });
-      this.childAttrFormColumns = childAttrFormColumns;
     },
     modalAddAttrInputShow(val) {
       this.attrTypeInput = val;
@@ -728,10 +775,10 @@ export default {
       this.attrTypeSelectValue = "";
     },
     handleClose(item, index) {
-      item.addValues.splice(index,1)
+      item.addValues.splice(index, 1);
       this.currentCategoryChildAttr = this.currentCategoryChildAttr.map(el => {
-        return el
-      })
+        return el;
+      });
     },
 
     variTypeChange(val) {
@@ -747,6 +794,7 @@ export default {
       } else {
         skArr.push(val);
       }
+
       skArr.forEach(el => {
         let names = el ? attrData.skuAttrRelation[el.toLowerCase()] : "";
         if (names) {
@@ -766,7 +814,7 @@ export default {
       this.currentCategoryChildAttr = currentSkarr;
       this.resetAddAttr();
     },
-    
+
     async categoryTypesCheckChange(value) {
       this.form.categoryTypesCheck = value;
       const params = {
@@ -842,15 +890,14 @@ export default {
       let y = date.getFullYear();
       let m = date.getMonth() + 1;
       let d = date.getDate();
-      m < 10 ? (m = '0' + m) : m;
-      d < 10 ? (d = '0' + d) : d;
+      m < 10 ? (m = "0" + m) : m;
+      d < 10 ? (d = "0" + d) : d;
       return `${y}-${m}-${d}`;
     },
     cascaderSel(val, selectedData) {
       const checkType = selectedData[selectedData.length - 1];
       this.form.categoryType = checkType.nodePath;
       this.form.categoryTypeId = checkType.id;
-      this.categoryTypeLabel = checkType.nodePath;
       if (checkType.categoryType.indexOf(",") !== -1) {
         this.hasCategoryTypesCheck = true;
         this.categoryTypesCheckOptions = checkType.categoryType.split(",");
@@ -886,7 +933,6 @@ export default {
         });
       }
     },
-    
 
     regionOptionsChange(obj) {
       const val = obj.value;
@@ -956,7 +1002,24 @@ export default {
 </script>
 <style lang="less">
 .newDrawContainer {
-  .ivu-layout-content{
+  .edit-item{
+    font-size: 16px;
+    padding: 10px 0;
+  }
+  .attrForm-item {
+    display: flex;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 600;
+    color: #7b7a7a;
+  }
+  .attrForm-item-show{
+     display: flex;
+     font-size: 16px;
+    color: #7b7a7a;
+  }
+
+  .ivu-layout-content {
     min-height: 0px;
   }
   .attrBtn-wrap {
@@ -1019,7 +1082,7 @@ export default {
 }
 </style>
 <style>
-.newDrawContainer .ivu-table{
+.newDrawContainer .ivu-table {
   min-height: 400px;
 }
 </style>

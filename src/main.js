@@ -8,21 +8,26 @@ import VueCookies from 'vue-cookies';
 import './style/index.less';
 //import 'iview/dist/styles/iview.css';
 import store from './store'
+import Cookies from 'js-cookie'
+import uuid from 'uuid/v4'
 Vue.use(VueCookies)
 Vue.use(iView)
+Vue.prototype.$uuid = uuid
+
 Vue.config.productionTip = false
 
 
 router.beforeEach((to, form, next) => {
         
-        // if (!router.app.$cookies.isKey('__v') && to.path !== '/login') {
-        //     next({
-        //         name: '登录页面'
-        //     })
-        // } else {
-        //     next()
-        // }
-        next()
+       
+        if (!router.app.$cookies.isKey('__v') && to.path !== '/login') {
+            next({
+                name: '登录页面'
+            })
+        } else {
+            next()
+        }
+        
        
     })
     /* eslint-disable no-new */
