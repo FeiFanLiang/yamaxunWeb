@@ -16,6 +16,13 @@ export default {
             data:params
         })
     },
+    async updateMer(params){
+        return axios({
+            method:'post',
+            url:'/editMer',
+            data:params
+        })
+    },
     async getMerListFromAuth(params){
         return axios({
             method:'post',
