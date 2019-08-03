@@ -2,10 +2,10 @@ import axios from 'axios'
 import {
     Message,
 } from 'iview';
-
+const baseURL = 'http://www.amazonvvip.com/api'
 
 const server = axios.create({
-    baseURL: 'http://127.0.0.1:7001/api',
+    baseURL,
     timeout: 8000,
     withCredentials: true
 })
@@ -30,7 +30,7 @@ server.interceptors.response.use((response) => {
 }, (error) => {
     console.log(error)
     Message.error(`您的请求失败`)
-   // Promise.reject(error)
+        // Promise.reject(error)
 })
 
 export default server
