@@ -13,13 +13,9 @@
             </Row>
             <template v-if="EditShow">
               <div class="edit-item">属性分类信息</div>
-              <div class="edit-item">
-                发布站点:{{form.country}}
-              </div>
-              <div class="edit-item">
-                分类目录:{{form.categoryType}}
-              </div>
-             
+              <div class="edit-item">发布站点:{{form.country}}</div>
+              <div class="edit-item">分类目录:{{form.categoryType}}</div>
+
               <div v-if="form.childAttr.length">
                 <span class="edit-item">变种信息展示</span>
                 <template v-for="(item,index) in form.childAttr">
@@ -41,192 +37,208 @@
             </Row>
             <template v-if="!EditShow">
               <Form-Item label="站点选择" prop="country">
-              <Select
-                v-model="form.country"
-                style="width:200px"
-                @on-change="regionOptionsChange"
-                label-in-value
-                placeholder="请选择站点"
-              >
-                <Option
-                  v-for="item in regions"
-                  :value="item.regionId"
-                  :key="item.regionId"
-                >{{ item.region }}</Option>
-              </Select>
-            </Form-Item>
-            <Form-Item label="产品分类" prop="categoryType">
-              <Cascader
-                :data="categoryTypes"
-                :load-data="loadData"
-                @on-change="cascaderSel"
-                width="200px"
-              ></Cascader>
-            </Form-Item>
-            <Form-Item label="分类类型" v-if="hasCategoryTypesCheck">
-              <Select v-model="form.categoryTypesCheck" @on-change="categoryTypesCheckChange">
-                <Option v-for="item in categoryTypesCheckOptions" :value="item" :key="item"></Option>
-              </Select>
-            </Form-Item>
-            <Form-Item label="售卖形式">
-              <Row class="varietaWrap">
-                <Spin size="large" fix v-if="spinShow"></Spin>
-                <RadioGroup v-model="form.hasVarieta">
-                  <Radio :label="0" true-value>单体</Radio>
-                  <Radio :label="1" false-value>多变种</Radio>
-                </RadioGroup>
-              </Row>
-            </Form-Item>
-
-            <Form-Item label="变种信息" v-if="form.hasVarieta">
-              <Row>
-                <Select v-model="form.VariType" @on-change="variTypeChange">
+                <Select
+                  v-model="form.country"
+                  style="width:200px"
+                  @on-change="regionOptionsChange"
+                  label-in-value
+                  placeholder="请选择站点"
+                >
                   <Option
-                    v-for="(value,index) in currentCategoryAttr.skuAttTheme.values"
-                    :key="index"
-                    :value="value"
-                    :label="value"
-                  ></Option>
+                    v-for="item in regions"
+                    :value="item.regionId"
+                    :key="item.regionId"
+                  >{{ item.region }}</Option>
                 </Select>
-              </Row>
-            </Form-Item>
-            <template v-if="form.VariType">
-              <div>变种属性</div>
-              <Modal
-                v-model="arrInputModal"
-                title="添加变种属性"
-                @on-ok="addAttrInput"
-                @on-cancel="cancelAddAttrInput"
-              >
-                <Input size="small" v-model="attrTypeInputValue" placeholder="请输入变种信息"></Input>
-              </Modal>
+              </Form-Item>
+              <Form-Item label="产品分类" prop="categoryType">
+                <Cascader
+                  :data="categoryTypes"
+                  :load-data="loadData"
+                  @on-change="cascaderSel"
+                  width="200px"
+                ></Cascader>
+              </Form-Item>
+              <Form-Item label="分类类型" v-if="hasCategoryTypesCheck">
+                <Select v-model="form.categoryTypesCheck" @on-change="categoryTypesCheckChange">
+                  <Option v-for="item in categoryTypesCheckOptions" :value="item" :key="item"></Option>
+                </Select>
+              </Form-Item>
+              <Form-Item label="售卖形式">
+                <Row class="varietaWrap">
+                  <Spin size="large" fix v-if="spinShow"></Spin>
+                  <RadioGroup v-model="form.hasVarieta">
+                    <Radio :label="0" true-value>单体</Radio>
+                    <Radio :label="1" false-value>多变种</Radio>
+                  </RadioGroup>
+                </Row>
+              </Form-Item>
 
-              <Modal
-                v-model="arrSelectModal"
-                title="添加变种属性"
-                @on-ok="addAttrSelect"
-                @on-cancel="cancelAddAttrSelect"
-              >
-                <template v-if="this.attrTypeSelect.values">
-                  <Select v-model="attrTypeSelectValue">
+              <Form-Item label="变种信息" v-if="form.hasVarieta">
+                <Row>
+                  <Select v-model="form.VariType" @on-change="variTypeChange">
                     <Option
-                      v-for="(value,i) in JSON.parse(this.attrTypeSelect.values)"
-                      :key="i"
-                      :label="value"
+                      v-for="(value,index) in currentCategoryAttr.skuAttTheme.values"
+                      :key="index"
                       :value="value"
+                      :label="value"
                     ></Option>
                   </Select>
-                </template>
-              </Modal>
-              <Row
-                :gutter="16"
-                type="flex"
-                justify="start"
-                align="middle"
-                v-for="(item,index) in currentCategoryChildAttr"
-                :key="index"
-              >
-                <Col class="attributeItem">{{item.attributeName}}</Col>
-                <template v-if="item.attributeType == 'input'">
-                  <Col>
-                    <div v-if="item.addValues && item.addValues.length">
+                </Row>
+              </Form-Item>
+              <template v-if="form.VariType">
+                <div>变种属性</div>
+                <Modal
+                  v-model="arrInputModal"
+                  title="添加变种属性"
+                  @on-ok="addAttrInput"
+                  @on-cancel="cancelAddAttrInput"
+                >
+                  <Input size="small" v-model="attrTypeInputValue" placeholder="请输入变种信息"></Input>
+                </Modal>
+
+                <Modal
+                  v-model="arrSelectModal"
+                  title="添加变种属性"
+                  @on-ok="addAttrSelect"
+                  @on-cancel="cancelAddAttrSelect"
+                >
+                  <template v-if="this.attrTypeSelect.values">
+                    <Select v-model="attrTypeSelectValue">
+                      <Option
+                        v-for="(value,i) in JSON.parse(this.attrTypeSelect.values)"
+                        :key="i"
+                        :label="value"
+                        :value="value"
+                      ></Option>
+                    </Select>
+                  </template>
+                </Modal>
+                <Row
+                  :gutter="16"
+                  type="flex"
+                  justify="start"
+                  align="middle"
+                  v-for="(item,index) in currentCategoryChildAttr"
+                  :key="index"
+                >
+                  <Col class="attributeItem">{{item.attributeName}}</Col>
+                  <template v-if="item.attributeType == 'input'">
+                    <Col>
+                      <div v-if="item.addValues && item.addValues.length">
+                        <Tag
+                          v-for="(el,index) in item.addValues"
+                          :key="el"
+                          closable
+                          @on-close="handleClose(item,index)"
+                        >{{el}}</Tag>
+                      </div>
+                    </Col>
+                    <Col>
+                      <Button size="small" @click="modalAddAttrInputShow(item)">添加</Button>
+                    </Col>
+                  </template>
+
+                  <Col v-if="item.attributeType == 'select'">
+                    <template v-if="item.addValues">
                       <Tag
                         v-for="(el,index) in item.addValues"
                         :key="el"
                         closable
                         @on-close="handleClose(item,index)"
                       >{{el}}</Tag>
-                    </div>
+                    </template>
+                    <Button size="small" @click="modalAddAttrSelectShow(item)">添加</Button>
                   </Col>
-                  <Col>
-                    <Button size="small" @click="modalAddAttrInputShow(item)">添加</Button>
-                  </Col>
+                </Row>
+
+                <Row v-if="childAttrFormShow" class="attrBtn-wrap">
+                  <Button type="success" size="small" @click="initChildAttrForm">生成变种子类型</Button>
+                </Row>
+
+                <div>变种类目编辑</div>
+                <template v-for="(item,index) in form.childAttr" v-if="form.childAttr.length">
+                  <Row v-if="index===0" :key="item.sku">
+                    <Col v-if="key !== '__id'" :span="2" v-for="(value,key,i) in item" :key="i">
+                      <span class="attrForm-item">{{key}}</span>
+                    </Col>
+                    <Col :span="2">
+                      <span class="attrForm-item">操作</span>
+                    </Col>
+                  </Row>
+                  <Row style="margin:10px 0;">
+                    <Col :span="2" v-if="key !== '__id'" v-for="(value,key,i) in item" :key="i">
+                      <span class="attrForm-item">
+                        <DatePicker
+                          type="daterange"
+                          @on-change="childAttrDiscountDate(item,$event)"
+                          formate="yyyy-MM-dd"
+                          placement="bottom-end"
+                          placeholder="Select date"
+                          style="width: 150px"
+                          v-if="key=='discountDate'"
+                          :key="i"
+                        ></DatePicker>
+                        <Input
+                          style="width:150px"
+                          v-else
+                          v-model="item[key]"
+                          :disabled="attrTypesNoEdit[key]||key== 'sku'"
+                        ></Input>
+                      </span>
+                    </Col>
+                    <Col :span="2">
+                      <span class="attrForm-item">
+                        <Button type="error" size="small" @click="delChildAttr(index)">移除</Button>
+                      </span>
+                    </Col>
+                  </Row>
                 </template>
-
-                <Col v-if="item.attributeType == 'select'">
-                  <template v-if="item.addValues">
-                    <Tag
-                      v-for="(el,index) in item.addValues"
-                      :key="el"
-                      closable
-                      @on-close="handleClose(item,index)"
-                    >{{el}}</Tag>
-                  </template>
-                  <Button size="small" @click="modalAddAttrSelectShow(item)">添加</Button>
-                </Col>
-              </Row>
-
-              <Row v-if="childAttrFormShow" class="attrBtn-wrap">
-                <Button type="success" size="small" @click="initChildAttrForm">生成变种子类型</Button>
-              </Row>
-
-              <div>变种类目编辑</div>
-              <template v-for="(item,index) in form.childAttr" v-if="form.childAttr.length">
-                <Row v-if="index===0" :key="item.sku">
-                  <Col v-if="key !== '__id'" :span="2" v-for="(value,key,i) in item" :key="i">
-                    <span class="attrForm-item">{{key}}</span>
-                  </Col>
-                  <Col :span="2">
-                    <span class="attrForm-item">操作</span>
-                  </Col>
-                </Row>
-                <Row style="margin:10px 0;">
-                  <Col :span="2" v-if="key !== '__id'" v-for="(value,key,i) in item" :key="i">
-                    
-                    <span class="attrForm-item">
-                      <DatePicker
-                        type="daterange"
-                        @on-change="childAttrDiscountDate(item,$event)"
-                        formate="yyyy-MM-dd"
-                        placement="bottom-end"
-                        placeholder="Select date"
-                        style="width: 150px"
-                        v-if="key=='discountDate'"
-                        :key="i"
-                      ></DatePicker>
-                      <Input
-                        style="width:150px"
-                        v-else
-                        v-model="item[key]"
-                        :disabled="attrTypesNoEdit[key]||key== 'sku'"
-                      ></Input>
-                     
-                    </span>
-                  </Col>
-                  <Col :span="2">
-                    <span class="attrForm-item">
-                      <Button type="error" size="small" @click="delChildAttr(index)">移除</Button>
-                    </span>
-                  </Col>
-                </Row>
               </template>
             </template>
-            </template>
-            
 
             <FormItem label="ParentSKU" prop="parentSku">
               <Input v-model="form.parentSku" disabled></Input>
             </FormItem>
 
-            <Row>
+            
+              <FormItem label="产品类别" prop="productType">
+                <Select v-model="form.productType">
+                  <Option
+                    v-for="(item,index) in currentCategoryAttr.product_type"
+                    :key="index"
+                    :value="item"
+                    :label="item"
+                  ></Option>
+                </Select>
+              </FormItem>
+            
+
+            
               <FormItem label="产品标题" prop="merChanName">
                 <Input v-model="form.merChanName" placeholder="产品标题"></Input>
               </FormItem>
-            </Row>
+              
+              <FormItem label="生产厂家" prop="Manufacturer">
+                <Input v-model="form.Manufacturer" placeholder="生产厂家"></Input>
+              </FormItem>
+
             <Row>
               <FormItem label="产品ID" prop="merChanId">
                 <Input v-model.number="form.merChanId" placeholder="必填,产品ID"></Input>
               </FormItem>
             </Row>
+
             <Form-Item label="产品数量" prop="quantity">
               <Input type="number" v-model.number="form.quantity"></Input>
             </Form-Item>
+
             <Row>
               <FormItem label="商品价格" prop="price">
                 <Input v-model="form.price" placeholder="商品价格"></Input>
               </FormItem>
             </Row>
-           
+
             <Row>
               <FormItem label="关键词" prop="keyword">
                 <Input v-model.number="form.keyword" placeholder="请输入关键词,不能超过250字符"></Input>
@@ -245,7 +257,7 @@
                 ></DatePicker>
               </FormItem>
             </Row>
-            <Form-Item label="产品状况" prop="status">
+           <!-- <Form-Item label="产品状况" prop="status">
               <Select v-model="form.status" style="width:200px">
                 <Option
                   v-for="item in comStatusOptions"
@@ -253,7 +265,7 @@
                   :key="item.value"
                 >{{ item.label }}</Option>
               </Select>
-            </Form-Item>
+            </Form-Item> -->
           </div>
         </TabPane>
         <TabPane label="描述信息" name="描述信息">
@@ -383,13 +395,14 @@
 <script>
 import { categoryApi, merchan } from "@/api";
 import { regions, comStatusOptions, attrData } from "@/common/options.js";
+import { mapState } from "vuex";
 export default {
   //quantity //title //id //keyword
   data() {
     return {
       comStatusOptions: comStatusOptions,
       regions: regions,
-      EditShow:false,
+      EditShow: false,
       currentRegion: {
         options: [
           {
@@ -407,7 +420,7 @@ export default {
         skuThemeAttr: "",
         skuAttTheme: ""
       },
-      
+
       //当前选择的属性下变种
       currentCategoryChildAttr: [],
       //当前选择变种属性下拉框
@@ -420,7 +433,7 @@ export default {
       attrTypeSelect: "",
       //当前选择的select类型变种子属性值
       attrTypeSelectValue: "",
-      attrTypesNoEdit:{},
+      attrTypesNoEdit: {},
       defalutAttrObj: {
         sku: "",
         conditionNote: "",
@@ -438,15 +451,18 @@ export default {
       childAttrFormShow: true,
       childAttrFormColumns: [],
       form: {
-        brand: "德国乐她美专卖",
+        brand: "",
         country: "",
         categoryType: "",
+        Manufacturer:"",
         parentSku: "",
         merChanId: "",
         merChanName: "",
         quantity: 50,
         price: "",
         status: 1,
+        model:'',
+        productType: "",
         description: "",
         keyword: "",
         point1: "",
@@ -483,6 +499,21 @@ export default {
       visible: false,
       uploadList: [],
       ruleValidate: {
+        Manufacturer:[
+          {
+            required:true,
+            message:'请输入生产厂家',
+            trigger:'blur'
+          }
+        ],
+        productType: [
+          {
+            required: true,
+            message: "请选择产品类别",
+            type: "string",
+            trigger: "change"
+          }
+        ],
         point1: [
           {
             required: true,
@@ -603,51 +634,81 @@ export default {
       }
     };
   },
-  computed: {},
+  computed: {
+    ...mapState(["userInfo"])
+  },
   created() {
     this.fetchData();
   },
 
   methods: {
-    resertEdit(){
-      this.EditShow = false
-      this.form.country = ''
-      this.form.childAttr = []
-      this.form.hasVarieta = 0
+    CheckBarCode(s) {
+      var a = 0,
+        b = 0,
+        c = 0,
+        d = 0,
+        e = 0;
+      for (var i = 1; i <= 12; i++) {
+        var sc = parseInt(s[i - 1]);
+        if (i <= 12 && i % 2 == 0) {
+          a += sc;
+        } else if (i <= 11 && i % 2 == 1) {
+          b += sc;
+        }
+      }
+      c = a * 3;
+      d = b + c;
+      if (d % 10 == 0) e = d - d;
+      else e = d + (10 - (d % 10)) - d;
+      return e;
+    },
+    //生成随机13位条码
+    createBarcode() {
+      var str = "69";
+      for (var i = 0; i < 10; i++) {
+        str += Math.floor(Math.random() * 10);
+      }
+      var checkcode = this.CheckBarCode(str);
+      return str + checkcode;
+    },
 
+    resertEdit() {
+      this.EditShow = false;
+      this.form.country = "";
+      this.form.childAttr = [];
+      this.form.hasVarieta = 0;
     },
     fetchData() {
       if (this.$route.query.edit) {
         sessionStorage.getItem("currentMer");
         this.form = JSON.parse(sessionStorage.getItem("currentMer"));
-        this.EditShow = true
-      }else{
-        this.form.parentSku = this.form.brand+'-'+this.$uuid()
+        this.EditShow = true;
+      } else {
+        this.form.brand = this.userInfo.brand;
+        this.form.parentSku = this.form.brand + "-" + this.$uuid();
       }
     },
 
     async addSubmit() {
-      
       this.$refs["newCommitFrom"].validate(valid => {
         if (valid) {
-          if(this.$route.query.edit){
-        merchan.updateMer(this.form).then((res) => {
-          if(res.code == 0){
-            this.$Message.success('修改成功')
-          }else{
-            this.$Message.error("修改失败");
+          if (this.$route.query.edit) {
+            merchan.updateMer(this.form).then(res => {
+              if (res.code == 0) {
+                this.$Message.success("修改成功");
+              } else {
+                this.$Message.error("修改失败");
+              }
+            });
+          } else {
+            merchan.addMer(this.form).then(res => {
+              if (res.code == 0) {
+                this.$Message.success("发布成功");
+              } else {
+                this.$Message.error("发布失败");
+              }
+            });
           }
-        })
-      }else{
-         merchan.addMer(this.form).then(res => {
-            if(res.code == 0){
-              this.$Message.success('发布成功')
-            }else{
-              this.$Message.error("发布失败");
-            }
-          });
-      }
-         
         } else {
           this.$Message.error("您的信息填写有误，请检查后重新提交");
         }
@@ -665,7 +726,7 @@ export default {
       const skuEndemicAttr = this.currentCategoryAttr.skuEndemicAttr;
 
       let obj = {
-        sku: '',
+        sku: "",
         conditionNote: "",
         price: "",
         discountPrice: "",
@@ -680,11 +741,10 @@ export default {
           skuAttThemeArr[key].addValues.length
         ) {
           let attrObj = {
-            name: skuAttThemeArr[key].attributeName,
+            name: skuAttThemeArr[key].attributeId,
             values: skuAttThemeArr[key].addValues
           };
-          this.attrTypesNoEdit[skuAttThemeArr[key].attributeName] = true
-          console.log(this.attrTypesNoEdit)
+          this.attrTypesNoEdit[skuAttThemeArr[key].attributeId] = true;
           childAttr.push(attrObj);
         }
       }
@@ -692,7 +752,6 @@ export default {
         skuEndemicAttr.forEach(endemic => {
           if (obj[endemic.attributeName] == undefined) {
             obj[endemic.attributeName] = "";
-            
           }
         });
       }
@@ -708,7 +767,7 @@ export default {
           });
         } else {
           let currentArr = [];
-          item.values.forEach((el,index) => {
+          item.values.forEach((el, index) => {
             resultArray.forEach(result => {
               let obj = {};
               obj[item.name] = el;
@@ -718,10 +777,10 @@ export default {
           resultArray = currentArr;
         }
       });
-      resultArray.forEach((el,index) => {
+      resultArray.forEach((el, index) => {
         let initObj = Object.assign({}, obj, el);
-        let currentindex = index<9?'0'+(index+1) : (index+1)
-        initObj.sku = `${this.form.parentSku}-${currentindex}`
+        let currentindex = index < 9 ? "0" + (index + 1) : index + 1;
+        initObj.sku = `${this.form.parentSku}-${currentindex}`;
         childChanList.push(initObj);
       });
       this.form.childAttr = childChanList;
@@ -740,6 +799,7 @@ export default {
       if (!this.attrTypeInput.addValues) {
         this.attrTypeInput.addValues = [];
       }
+      debugger
       if (
         this.attrTypeInput.addValues.indexOf(this.attrTypeInputValue) === -1
       ) {
@@ -832,12 +892,15 @@ export default {
       let skuAttThemeArr = [];
       let skuAttThemeReal = {};
       let skuEndemicAttr = [];
-      console.log(attrData);
+      let product_type = [];
       this.categoryAttrOrigin.forEach(el => {
         if (el.attributeId == "variation_theme") skuAttTheme = el;
         if (attrData.skuNotDisplay.indexOf(el.attributeId) === -1) {
           if (el.variantionSpecifics === 1) {
             skuEndemicAttr.push(el);
+          }
+          if (el.attributeId == "feed_product_type") {
+            product_type = JSON.parse(el.values);
           }
           skuAttThemeArr.push(el);
         }
@@ -877,8 +940,8 @@ export default {
       this.currentCategoryAttr.skuAttTheme = skuAttTheme;
       this.currentCategoryAttr.skuEndemicAttr = skuEndemicAttr;
       this.currentCategoryAttr.skuThemeAttr = skuAttThemeReal;
+      this.currentCategoryAttr.product_type = product_type;
       this.spinShow = false;
-      console.log(this.currentCategoryAttr);
     },
     soldDateFormat(date) {
       this.form.soldDate = date;
@@ -1002,7 +1065,7 @@ export default {
 </script>
 <style lang="less">
 .newDrawContainer {
-  .edit-item{
+  .edit-item {
     font-size: 16px;
     padding: 10px 0;
   }
@@ -1013,9 +1076,9 @@ export default {
     font-weight: 600;
     color: #7b7a7a;
   }
-  .attrForm-item-show{
-     display: flex;
-     font-size: 16px;
+  .attrForm-item-show {
+    display: flex;
+    font-size: 16px;
     color: #7b7a7a;
   }
 

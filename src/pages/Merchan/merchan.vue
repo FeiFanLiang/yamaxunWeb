@@ -37,25 +37,55 @@
     <Row type="flex" justify="center">
         <Page  :current="current" :page-size="30" :total="total" @on-change="getMerList" show-total />
     </Row>
+    <Modal
+        v-model="modalShow"
+        title="导出表格"
+        :loading="modalLoading"
+        @on-ok="submit">
+       <Form>
+        <Form-Item label="国家">
+          <Select @on-change="regionOptionsChange">
+            <Option v-for="(item,index) in regions" :key="index" :value="item.regionId" :label="item.region"></Option>
+          </Select>
+        </Form-Item>
+        <Form-Item label="分类">
+          <Select >
+            
+          </Select>
+        </Form-Item>
+        <Form-Item label="时间">
+          
+        </Form-Item>
+        </Form>
+    </Modal>
   </section>
 </template>
 <script>
 import { merchan } from "@/api";
-import childChan from './childChanList.vue'
+import {regions} from '@/common/options.js';
+import childChan from './childChanList.vue';
+import {categoryApi} from '@/api'
 export default {
   comments:{
       childChan
   },
   data() {
     return {
+      modalShow:false,
+      modalLoading:false,
         selectArr:[],
         current:1,
         total:0,
         loading:false,
         selfList:false,
+        regions:regions,
+        categoryTypes:[],
         query:{
            merChanName:'', 
            creatTime:'',
+        },
+        exportQuery:{
+
         },
       columns1: [
         {
@@ -109,13 +139,29 @@ export default {
       this.reciverQuery()
   },
   methods: {
+     regionOptionsChange(val) {
+      debugger
+      const params = {
+          site: val
+        };
+        categoryApi.getCategoryList(params).then(res => {
+          debugger
+          this.categoryTypes.push(...res.data);
+        });
+    }, 
       reciverQuery(){
           const query = this.$route.query
           if(!query.auth || !query.user){
               this.selfList = true
           }
       },
-      async exportCsv(){},
+      async exportCsv(){
+        this.modalShow = true;
+
+      },
+      async submit(){
+
+      },
       async editColumns(row){
           sessionStorage.setItem('currentMer',JSON.stringify(row))
           this.$router.push({
