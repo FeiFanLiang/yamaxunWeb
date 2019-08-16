@@ -272,7 +272,6 @@ export default {
                 obj['external_product_id'] = el.ean
                 obj['external_product_id_type'] = 'EAN'
             }
-            debugger
             merchants.push(...current)
         })
         
