@@ -458,6 +458,7 @@ export default {
         parentSku: "",
         merChanId: "",
         merChanName: "",
+        categoryTypeId:'',
         quantity: 50,
         price: "",
         status: 1,
@@ -702,8 +703,9 @@ export default {
             });
           } else {
             merchan.addMer(this.form).then(res => {
-              if (res.code == 0) {
+              if (res.code == 1) {
                 this.$Message.success("发布成功");
+                this.$refs['newCommitFrom'].resetFields()
               } else {
                 this.$Message.error("发布失败");
               }
@@ -799,7 +801,6 @@ export default {
       if (!this.attrTypeInput.addValues) {
         this.attrTypeInput.addValues = [];
       }
-      debugger
       if (
         this.attrTypeInput.addValues.indexOf(this.attrTypeInputValue) === -1
       ) {
@@ -893,14 +894,15 @@ export default {
       let skuAttThemeReal = {};
       let skuEndemicAttr = [];
       let product_type = [];
+      this.categoryAttrOrigin
       this.categoryAttrOrigin.forEach(el => {
         if (el.attributeId == "variation_theme") skuAttTheme = el;
+        if (el.attributeId == "feed_product_type") {
+            product_type = JSON.parse(el.values);
+          }
         if (attrData.skuNotDisplay.indexOf(el.attributeId) === -1) {
           if (el.variantionSpecifics === 1) {
             skuEndemicAttr.push(el);
-          }
-          if (el.attributeId == "feed_product_type") {
-            product_type = JSON.parse(el.values);
           }
           skuAttThemeArr.push(el);
         }

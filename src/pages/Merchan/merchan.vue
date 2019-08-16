@@ -42,29 +42,34 @@
         title="导出表格"
         :loading="modalLoading"
         @on-ok="submit">
-       <Form>
+       <Form :model="exportQuery" :rules="ruleValidate" ref="exportForm">
         <Form-Item label="国家">
           <Select @on-change="regionOptionsChange">
             <Option v-for="(item,index) in regions" :key="index" :value="item.regionId" :label="item.region"></Option>
           </Select>
         </Form-Item>
-        <Form-Item label="分类">
-          <Select >
-            
+        <Form-Item label="分类" prop="id">
+          <Select :loading="selectLoading" v-model="exportQuery.id">
+            <Option v-for="(item,index) in categoryTypes" :key="index" :value="item.categoryId" :label="item.label"></Option>
           </Select>
         </Form-Item>
-        <Form-Item label="时间">
-          
+        <Form-Item label="时间" prop="dateRange"> 
+           <DatePicker :value="exportQuery.dateRange" @on-change="pickDate" format="yyyy-MM-dd" type="daterange" placement="bottom-end" placeholder="Select date" style="width: 200px"></DatePicker>
+        </Form-Item>
+        <Form-Item label="生成表格名" prop="excelName"> 
+           <Input v-model="exportQuery.excelName" placeholder="下载表格名(必填)"></Input>
         </Form-Item>
         </Form>
     </Modal>
   </section>
 </template>
 <script>
-import { merchan } from "@/api";
+import { merchan,categoryApi} from "@/api";
+import xlsx from 'xlsx';
+import xlsxStyle from 'xlsx-style';
 import {regions} from '@/common/options.js';
 import childChan from './childChanList.vue';
-import {categoryApi} from '@/api'
+
 export default {
   comments:{
       childChan
@@ -73,6 +78,7 @@ export default {
     return {
       modalShow:false,
       modalLoading:false,
+      selectLoading:false,
         selectArr:[],
         current:1,
         total:0,
@@ -83,9 +89,11 @@ export default {
         query:{
            merChanName:'', 
            creatTime:'',
+           excelName:''
         },
         exportQuery:{
-
+          id:'',
+          dateRange:[]
         },
       columns1: [
         {
@@ -131,6 +139,31 @@ export default {
           align: "center"
         }
       ],
+      ruleValidate:{
+        id:[
+          {
+            required:true,
+            message:'分类必选',
+            trigger:'change',
+            type:'string'
+          }
+        ],
+        dateRange:[
+          {
+            required:true,
+            message:'日期必选',
+            trigger:'change',
+            type:'array'
+          }
+        ],
+        excelName:[
+          {
+            required:true,
+            message:'表格名必填',
+            trigger:'blur'
+          }
+        ]
+      },
      formList:[]
     };
   },
@@ -139,14 +172,18 @@ export default {
       this.reciverQuery()
   },
   methods: {
+      pickDate(val){
+        this.exportQuery.dateRange = val
+      },
      regionOptionsChange(val) {
-      debugger
       const params = {
           site: val
         };
+        this.loading = true
         categoryApi.getCategoryList(params).then(res => {
-          debugger
+          this.categoryTypes = []
           this.categoryTypes.push(...res.data);
+          this.loading = false
         });
     }, 
       reciverQuery(){
@@ -160,8 +197,157 @@ export default {
 
       },
       async submit(){
-
+        this.$refs['exportForm'].validate(async (valid) => {
+          if(valid){
+            const params = {
+              startDate:this.exportQuery.dateRange[0],
+              endDate:this.exportQuery.dateRange[1],
+              id:this.exportQuery.id,
+              excelName:this.exportQuery.excelName
+            }
+            
+            merchan.excelLoad(params).then((res) => {
+              if(!res.data.length){
+                this.$Message.error('数据为空')
+                return
+              }
+              if(!res.template){
+                this.$Message.error('模板为空')
+                return
+              }
+              const data = res.data
+              const template = res.template.template
+              const saveName = params.excelName
+              this.creatExcelLoad(data,template,saveName)
+            })
+          }
+        })
       },
+      initExcelData(data){
+        const merchants = []
+        data.forEach(el => {
+            let current = []
+            let obj = {
+                'manufacturer':el.Manufacturer,
+                'feed_product_type':el.productType,
+                'item_sku':el.parentSku,
+                'brand_name':el.brand,
+                'item_name':el.merChanName,
+                'recommended_browse_nodes':el.categoryTypeId,
+                'standard_price':el.price,
+                'quantity':el.quantity,
+                'product_description':el.description,
+                'model':el.model,
+                'bullet_point1':el.point1,
+                'bullet_point2':el.point2,
+                'bullet_point3':el.point3,
+                'bullet_point4':el.point4,
+                'bullet_point5':el.point5,
+                'generic_keywords':el.keyword,
+                'country_of_origin':'China',
+                'condition_type':el.status
+            }
+            if(el.discountDate.length){
+                obj['sale_price'] = el.discountPrice
+                obj['sale_from_date'] = el.discountDate[0],
+                obj['sale_end_date'] = el.discountDate[1]
+            }
+            current.push(obj)
+            if(el.childAttr.length){
+                el.childAttr.forEach(child => {
+                    obj['parent_child'] = 'Parent'
+                    let children = Object.assign({},obj,child)
+                    children['item_sku'] = child.sku
+                    children['external_product_id'] = child.ean
+                    children['external_product_id_type'] = 'EAN'
+                    children['model'] = child.model
+                    children['parent_child'] = 'Child'
+                    children['parent_sku'] = obj['item_sku']
+                    children['relationship_type'] = 'Variation'
+                    children['variation_theme'] = el.VariType
+                    children['number_of_items'] = child.quantity
+                    current.push(children)
+                })
+            }else{
+                obj['external_product_id'] = el.ean
+                obj['external_product_id_type'] = 'EAN'
+            }
+            debugger
+            merchants.push(...current)
+        })
+        
+       return merchants
+    },
+    renderExcel(merchants,template){
+    const table = template
+    
+    
+    for(let i=0,l=merchants.length;i<l;i++){
+        for(let k in merchants[i]){
+            for(let key in table){
+                if(table[key].v == k){
+                    let index = Number(key.slice(-1))+i+1
+                    let cell = key.slice(0,key.length - 1)
+                    table[cell+index] = {
+                        t:'s',
+                        v:merchants[i][k] || '',
+                        h:merchants[i][k] || '',
+                        w:merchants[i][k] || ''
+                    }
+                }
+            }
+        }
+        
+    }
+    const oldRef = table['!ref']
+    const colsStyle = []
+    for(let tr in table){
+      colsStyle.push({wch:50})
+    }
+    table['!cols'] = colsStyle
+    table['!ref'] = oldRef.slice(0,oldRef.length - 1)+(Number(oldRef.slice(-1))+merchants.length)
+    const wb = xlsx.utils.book_new();
+    const renderTable = Object.assign({},table)
+    var wopts = {
+        bookType: 'xlsm', // 要生成的文件类型
+        bookSST: false, // 是否生成Shared String Table，官方解释是，如果开启生成速度会下降，但在低版本IOS设备上有更好的兼容性
+        type: 'binary'
+    };
+    xlsx.utils.book_append_sheet(wb, renderTable, 'Sheet1');
+    var wbout = xlsxStyle.write(wb, wopts);
+    var blob = new Blob([this.s2ab(wbout)], {type:"application/octet-stream"});
+    return blob;
+   },
+   // 字符串转ArrayBuffer
+  s2ab(s) {
+        var buf = new ArrayBuffer(s.length);
+        var view = new Uint8Array(buf);
+        for (var i=0; i!=s.length; ++i) view[i] = s.charCodeAt(i) & 0xFF;
+        return buf;
+    },
+   openDownloadDialog(url, saveName)
+{
+    if(typeof url == 'object' && url instanceof Blob)
+    {
+        url = URL.createObjectURL(url); // 创建blob地址
+    }
+    var aLink = document.createElement('a');
+    aLink.href = url;
+    aLink.download = saveName+'.xlsm' || ''; // HTML5新增的属性，指定保存文件名，可以不要后缀，注意，file:///模式下不会生效
+    var event;
+    if(window.MouseEvent) event = new MouseEvent('click');
+    else
+    {
+        event = document.createEvent('MouseEvents');
+        event.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+    }
+    aLink.dispatchEvent(event);
+},
+creatExcelLoad(data,template,saveName){
+  const tableData = this.initExcelData(data)
+  const table = this.renderExcel(tableData,template)
+  this.openDownloadDialog(table,saveName)
+},
       async editColumns(row){
           sessionStorage.setItem('currentMer',JSON.stringify(row))
           this.$router.push({

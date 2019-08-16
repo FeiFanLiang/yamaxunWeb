@@ -36,5 +36,12 @@ export default {
             url:'/deleteMer',
             params
         })
+    },
+    async excelLoad(params){
+        return axios({
+            method:'get',
+            url:'/excel',
+            params
+        })
     }
 }
