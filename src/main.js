@@ -10,6 +10,8 @@ import './style/index.less';
 import store from './store'
 import Cookies from 'js-cookie'
 import uuid from 'uuid/v4'
+
+
 Vue.use(VueCookies)
 Vue.use(iView)
 Vue.prototype.$uuid = uuid

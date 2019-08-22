@@ -223,6 +223,23 @@ export default {
           }
         })
       },
+      initStatusFormCountry(country){
+       if(country == 'de'){
+           return 'Neu'
+       }
+       if(country == 'uk'){
+           return 'New'
+       }
+       if(country == 'fr'){
+           return 'Neuf'
+       }
+       if(country == 'it'){
+           return 'Nuovo'
+       }
+       if(country == 'es'){
+           return 'Nuevo'
+       }
+    },
       initExcelData(data){
         const merchants = []
         data.forEach(el => {
@@ -244,8 +261,13 @@ export default {
                 'bullet_point4':el.point4,
                 'bullet_point5':el.point5,
                 'generic_keywords':el.keyword,
+                'main_image_url':el.mainImgUrl1,
+                'other_image_url1':el.mainImgUrl2,
+                'other_image_url2':el.mainImgUrl3,
+                'other_image_url3':el.mainImgUrl4,
+                'other_image_url4':el.mainImgUrl5,
                 'country_of_origin':'China',
-                'condition_type':el.status
+                'condition_type':el.status || this.initStatusFormCountry(el.country)
             }
             if(el.discountDate.length){
                 obj['sale_price'] = el.discountPrice
@@ -266,6 +288,7 @@ export default {
                     children['relationship_type'] = 'Variation'
                     children['variation_theme'] = el.VariType
                     children['number_of_items'] = child.quantity
+                    children['main_image_url'] = el.imgurl
                     current.push(children)
                 })
             }else{

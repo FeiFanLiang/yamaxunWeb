@@ -73,8 +73,8 @@
                   </RadioGroup>
                 </Row>
               </Form-Item>
-
-              <Form-Item label="变种信息" v-if="form.hasVarieta">
+              <template v-if="!form.spiderChild || !form.spiderChild.length">
+                 <Form-Item label="变种信息" v-if="form.hasVarieta">
                 <Row>
                   <Select v-model="form.VariType" @on-change="variTypeChange">
                     <Option
@@ -160,7 +160,7 @@
                 <template v-for="(item,index) in form.childAttr" v-if="form.childAttr.length">
                   <Row v-if="index===0" :key="item.sku">
                     <Col v-if="key !== '__id'" :span="2" v-for="(value,key,i) in item" :key="i">
-                      <span class="attrForm-item">{{key}}</span>
+                      <span class="attrForm-item">{{key}}{{translationLabel(key)}}</span>
                     </Col>
                     <Col :span="2">
                       <span class="attrForm-item">操作</span>
@@ -196,11 +196,56 @@
                 </template>
               </template>
             </template>
-
+              </template>
+             
+            <Row v-if="form.spiderChild && form.spiderChild.length" class="ccc">
+              <Button type="error" @click="spiderEdit">采集变种编辑</Button>
+            </Row>
+            <div v-if="spiderDialog">
+        <template v-for="(item,index) in form.spiderChild">
+                  <Row v-if="index===0" :key="item.sku" type="flex" justify="center" :gutter="20">
+                    <Col :span="2" v-for="(value,key,i) in item" :key="i">
+                      <span class="attrForm-item">{{key}}</span>
+                    </Col>
+                    <Col :span="2">
+                      <span class="attrForm-item">操作</span>
+                    </Col>
+                  </Row>
+                  <Row style="margin:10px 0;" type="flex" justify="center" :gutter="20">
+                    <Col :span="2"  v-for="(value,key,i) in item" :key="i">
+                      <span class="attrForm-item">
+                        <template v-if="key == 'attr1' || key =='attr2'">
+                         <Select v-model="item[key]['name']">
+                          <Option v-for="(i,index) of spiderSelect" :label="i" :key="index" :value="i"></Option>
+                        </Select>
+                        <Input
+                          style="width:150px"
+                          v-model="item[key]['value']"
+                          :disabled="attrTypesNoEdit[key]||key== 'sku'"
+                        ></Input>
+                        </template>
+                       <template v-else>
+                          <Input
+                          style="width:150px"
+                          v-model="item[key]"
+                          :disabled="attrTypesNoEdit[key]||key== 'sku'"
+                        ></Input>
+                       </template>
+                       
+                      </span>
+                    </Col>
+                    <Col :span="2">
+                      <span class="attrForm-item">
+                        <Button type="error" size="small" @click="delSpiderChild(index)">移除</Button>
+                      </span>
+                    </Col>
+                  </Row>
+                </template>
+      </div>
             <FormItem label="ParentSKU" prop="parentSku">
               <Input v-model="form.parentSku" disabled></Input>
             </FormItem>
-
+            
             
               <FormItem label="产品类别" prop="productType">
                 <Select v-model="form.productType">
@@ -222,11 +267,7 @@
               <FormItem label="生产厂家" prop="Manufacturer">
                 <Input v-model="form.Manufacturer" placeholder="生产厂家"></Input>
               </FormItem>
-
             <Row>
-              <FormItem label="产品ID" prop="merChanId">
-                <Input v-model.number="form.merChanId" placeholder="必填,产品ID"></Input>
-              </FormItem>
             </Row>
 
             <Form-Item label="产品数量" prop="quantity">
@@ -235,7 +276,7 @@
 
             <Row>
               <FormItem label="商品价格" prop="price">
-                <Input v-model="form.price" placeholder="商品价格"></Input>
+                <Input v-model="form.price" placeholder="商品价格,保留两位小数"></Input>
               </FormItem>
             </Row>
 
@@ -257,15 +298,6 @@
                 ></DatePicker>
               </FormItem>
             </Row>
-           <!-- <Form-Item label="产品状况" prop="status">
-              <Select v-model="form.status" style="width:200px">
-                <Option
-                  v-for="item in comStatusOptions"
-                  :value="item.value"
-                  :key="item.value"
-                >{{ item.label }}</Option>
-              </Select>
-            </Form-Item> -->
           </div>
         </TabPane>
         <TabPane label="描述信息" name="描述信息">
@@ -344,8 +376,23 @@
             </Col>
           </Row>
         </TabPane>
-        <!-- <TabPane label="图片信息" name="图片信息">
-          <div class="demo-upload-list" v-for="item in uploadList">
+        <TabPane label="图片信息" name="图片信息">
+          <FormItem label="主图片1" prop="point5">
+                <Input type="textarea" :rows="1" placeholder="主图1" v-model="form.mainImgUrl1"></Input>
+              </FormItem>
+               <FormItem label="主图片2" prop="point5">
+                <Input type="textarea" :rows="1" placeholder="主图2" v-model="form.mainImgUrl2"></Input>
+              </FormItem>
+               <FormItem label="主图片3" prop="point5">
+                <Input type="textarea" :rows="1" placeholder="主图3" v-model="form.mainImgUrl3"></Input>
+              </FormItem>
+               <FormItem label="主图片4" prop="point5">
+                <Input type="textarea" :rows="1" placeholder="主图4" v-model="form.mainImgUrl4"></Input>
+              </FormItem>
+               <FormItem label="主图片5" prop="point5">
+                <Input type="textarea" :rows="1" placeholder="主图5" v-model="form.mainImgUrl5"></Input>
+              </FormItem>
+          <!-- <div class="demo-upload-list" v-for="item in uploadList">
             <template v-if="item.status === 'finished'">
               <img :src="item.url" />
               <div class="demo-upload-list-cover">
@@ -382,14 +429,16 @@
               v-if="visible"
               style="width: 100%"
             />
-          </Modal>
-        </TabPane>-->
+          </Modal> -->
+        </TabPane>
       </Tabs>
     </Form>
     <div>
       <Button @click="isShow=false">取消</Button>
       <Button type="primary" @click="addSubmit">提交</Button>
     </div>
+      
+        
   </section>
 </template>
 <script>
@@ -403,6 +452,7 @@ export default {
       comStatusOptions: comStatusOptions,
       regions: regions,
       EditShow: false,
+      spiderDialog:false,
       currentRegion: {
         options: [
           {
@@ -449,7 +499,9 @@ export default {
       arrInputModal: false,
       arrSelectModal: false,
       childAttrFormShow: true,
+      isFromSpider:false,
       childAttrFormColumns: [],
+      spiderSelect:[],
       form: {
         brand: "",
         country: "",
@@ -471,7 +523,11 @@ export default {
         point3: "",
         point4: "",
         point5: "",
-        commImg1: "",
+        mainImgUrl1: "",
+        mainImgUrl2: "",
+        mainImgUrl3: "",
+        mainImgUrl4: "",
+        mainImgUrl5: "",
         soldDate: this.formatDate(new Date()),
         hasVarieta: 0,
         VariType: "",
@@ -484,18 +540,7 @@ export default {
         categoryTypesCheck: "",
         childAttr: []
       },
-      defaultList: [
-        {
-          name: "a42bdcc1178e62b4694c830f028db5c0",
-          url:
-            "https://o5wwk8baw.qnssl.com/a42bdcc1178e62b4694c830f028db5c0/avatar"
-        },
-        {
-          name: "bc7521e033abdd1e92222d733590f104",
-          url:
-            "https://o5wwk8baw.qnssl.com/bc7521e033abdd1e92222d733590f104/avatar"
-        }
-      ],
+      
       imgName: "",
       visible: false,
       uploadList: [],
@@ -643,6 +688,32 @@ export default {
   },
 
   methods: {
+    spiderSave(){
+
+    },
+    spiderEdit(){
+      this.spiderDialog  = true
+      this.initSpiderChild()
+    },
+    translationLabel(val){
+      if(val == 'conditionNote'){
+        return '(状况说明)'
+      }
+      if(val == 'discountPrice'){
+        return '(折扣价)'
+      }
+      if(val == 'discountDate'){
+        return '(打折时间)'
+      }
+      if(val == 'quantity'){
+        return '(变种数量)'
+      }
+      if(val == 'imgurl'){
+        return '(变种图片)'
+      }
+
+      
+    },
     CheckBarCode(s) {
       var a = 0,
         b = 0,
@@ -694,13 +765,43 @@ export default {
       this.$refs["newCommitFrom"].validate(valid => {
         if (valid) {
           if (this.$route.query.edit) {
-            merchan.updateMer(this.form).then(res => {
-              if (res.code == 0) {
+            
+            if(this.form.spiderChild.length){
+              const data = this.form.spiderChild
+              for(let el of this.form.spiderChild){
+                 let attr1 = el.attr1
+                let name1 = attr1.name
+                let value1 = attr1.value
+                let attr2 = el.attr2
+                let name2 = attr2.name
+                let value2 = attr2.value2
+                delete el.attr1
+                delete el.attr2
+               el.name1 = value1
+               el.name2 = value2
+              }
+              
+
+              this.form.childAttr = this.form.spiderChild
+              this.form.spiderChild = []
+              merchan.updateMer(this.form).then(res => {
+              if (res.code == 1) {
+                this.$Message.success("修改成功");
+                this.$router.go(-1)
+              } else {
+                this.$Message.error("修改失败");
+              }
+            });
+            }else{
+               merchan.updateMer(this.form).then(res => {
+              if (res.code == 1) {
                 this.$Message.success("修改成功");
               } else {
                 this.$Message.error("修改失败");
               }
             });
+            }
+           
           } else {
             merchan.addMer(this.form).then(res => {
               if (res.code == 1) {
@@ -720,23 +821,53 @@ export default {
     childAttrDiscountDate(item, date) {
       item.discountDate = date;
     },
+    delSpiderChild(index){
+      this.form.spiderChild.splice(index,1)
+    },
     delChildAttr(index) {
       this.form.childAttr.splice(index, 1);
     },
+    initSpiderChild(){
+      
+      let childChanList = [];
+      this.spiderSelect = ['color_name','size_map','color_map','size_name']
+      this.form.spiderChild = this.form.spiderChild.map((el,index) => {
+        let currentindex = index < 9 ? "0" + (index + 1) : index + 1;
+        let obj = {
+          attr1:{
+            name:'',
+            value:el.name
+          },
+          attr2:{
+            name:'',
+            value:el.skuName || ''
+          },
+          sku:`${this.form.parentSku}-${currentindex}`,
+          price:el.price || 0,
+          quantity:el.quality || 50,
+          imgurl:el.imgurl || ''
+        }
+        return obj
+      })
+    },
     initChildAttrForm() {
+      
       const skuAttThemeArr = this.currentCategoryAttr.skuThemeAttr;
       const skuEndemicAttr = this.currentCategoryAttr.skuEndemicAttr;
-
+    
       let obj = {
         sku: "",
         conditionNote: "",
         price: "",
         discountPrice: "",
         discountDate: "",
-        quantity: ""
+        quantity: "",
+        imgurl:''
       };
+      
       let childAttr = [];
       let childChanList = [];
+      
       for (let key in skuAttThemeArr) {
         if (
           skuAttThemeArr[key].addValues &&
@@ -752,8 +883,8 @@ export default {
       }
       if (skuEndemicAttr) {
         skuEndemicAttr.forEach(endemic => {
-          if (obj[endemic.attributeName] == undefined) {
-            obj[endemic.attributeName] = "";
+          if (obj[endemic.attributeId] == undefined) {
+            obj[endemic.attributeId] = "";
           }
         });
       }
@@ -873,6 +1004,8 @@ export default {
       });
 
       this.currentCategoryChildAttr = currentSkarr;
+      
+      
       this.resetAddAttr();
     },
 
@@ -1070,6 +1203,9 @@ export default {
   .edit-item {
     font-size: 16px;
     padding: 10px 0;
+  }
+  .ccc{
+    margin: 20px 0;
   }
   .attrForm-item {
     display: flex;
