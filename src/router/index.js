@@ -59,8 +59,14 @@ export default new Router({
             name:'商品编辑',
             path:'editCommit',
             meta:{},
-            component: () => import('@/pages/Newchan/newchan')
-        }]
+            component: () => import('@/pages/Newchan/chanEditPage')
+        },
+    {
+        name:'dd',
+        path:'ccc',
+        meta:{},
+        component:() =>import('@/pages/Newchan/newchan')
+    }]
         },
         {
             name: '登录页面',

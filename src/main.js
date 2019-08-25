@@ -10,8 +10,9 @@ import './style/index.less';
 import store from './store'
 import Cookies from 'js-cookie'
 import uuid from 'uuid/v4'
-
-
+import ElementUI from 'element-ui';
+import 'element-ui/lib/theme-chalk/index.css';
+Vue.use(ElementUI)
 Vue.use(VueCookies)
 Vue.use(iView)
 Vue.prototype.$uuid = uuid
