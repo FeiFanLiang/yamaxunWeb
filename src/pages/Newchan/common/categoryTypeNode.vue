@@ -56,9 +56,12 @@ export default {
     };
   },
   methods: {
+		getCurrentSelect(){
+			let current = this.$refs['case'].getCheckedNodes();
+			return current[0].data
+		},
     handleChange(val) {
       let current = this.$refs['case'].getCheckedNodes();
-      debugger
       this.$emit('picked',current[0].data)
     },
     

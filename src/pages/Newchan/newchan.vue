@@ -1096,7 +1096,6 @@ export default {
       const checkType = selectedData[selectedData.length - 1];
       this.form.categoryType = checkType.nodePath;
       this.form.categoryTypeId = checkType.id;
-      debugger
       if (checkType.categoryType.indexOf(",") !== -1) {
         this.hasCategoryTypesCheck = true;
         this.categoryTypesCheckOptions = checkType.categoryType.split(",");

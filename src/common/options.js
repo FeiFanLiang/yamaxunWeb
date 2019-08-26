@@ -30,6 +30,38 @@ export const comStatusOptions = [{
   }
 ]
 
+export const tableColumn = [{
+	en: 'color_name',
+	zh: 'color_name(颜色名称)'
+}, {
+  en: 'color_map',
+  zh: '(color_map)颜色映射'
+},
+{
+	en:'size_name',
+	zh: '(size_name)尺寸名称'
+},
+{
+  en: 'size_map',
+  zh: '(size_map)尺寸映射'
+},
+{
+  en: 'price',
+  zh: '(price)价格'
+},
+{
+	en: 'conditionNote',
+	zh: '(conditionNote)状况说明'
+},
+{
+  en: 'quantity',
+  zh: '(quantity)数量'
+},
+{
+  en: 'imgurl',
+  zh: '图片链接'
+}
+]
 
 export const attrData = {
   joinStr: '&-&',

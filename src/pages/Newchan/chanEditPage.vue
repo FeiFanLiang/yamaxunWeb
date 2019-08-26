@@ -74,6 +74,7 @@
         </el-tab-pane>
         <el-tab-pane label="变种信息" name="second">
           <attrDetail v-if="attrPickShow" :baseDetail="currentCategoryAttr" :VariType="form.VariType"></attrDetail>
+					<!-- <spiderAttrEdit @editCallback="reSpiderChild"></spiderAttrEdit> -->
         </el-tab-pane>
         <el-tab-pane label="图片信息" name="third">
         <el-form-item label="主图链接1">
@@ -99,13 +100,14 @@
   </section>
 </template>
 <script>
+import spiderAttrEdit from './common/spiderAttrEdit'
 import attrDetail from './common/attrDetail'
 import categoryTypeNode from './common/categoryTypeNode'
 import countrySelect from './common/countrySelect'
 import { regions,attrData } from "@/common/options.js";
 import {categoryApi} from '@/api';
 export default {
-    components:{countrySelect,categoryTypeNode,attrDetail},
+    components:{countrySelect,categoryTypeNode,attrDetail,spiderAttrEdit},
   data() {
     return {
       activeName: "first",
@@ -153,11 +155,17 @@ export default {
       attrPickShow:false
     };
   },
+	mounted(){
+		this.checkQuery()
+	},
   watch:{
       'form.country'(val){
 
       },
       async pickSpiltCategoryTypeAttr(val){
+				if(!val){
+					return
+				}
         const params = {
         site: this.form.country,
         categoryType:val
@@ -184,6 +192,17 @@ export default {
       }
   },
   methods:{
+		checkQuery(){
+			if(this.$route.query.edit){
+				const form = JSON.parse(sessionStorage.getItem("currentMer"))
+				debugger
+				this.form = Object.assign({},form,this.form)
+				debugger
+			}
+		},
+		reSpiderChild(data){
+
+		},
      formatDate(date) {
       let y = date.getFullYear();
       let m = date.getMonth() + 1;
@@ -193,7 +212,9 @@ export default {
       return `${y}-${m}-${d}`;
     },
     async handlePicked(val){
-      debugger
+			this.pickSpiltCategoryTypeAttr = ''
+			this.$set(this.form,'productType','')
+			this.splitCategoryTypeAttrOptions = []
       const checkType = val
       this.form.categoryType = checkType.id
       if (checkType.categoryType.indexOf(",") !== -1) {
@@ -222,7 +243,7 @@ export default {
       let skuAttThemeReal = {};
       let skuEndemicAttr = [];
       let product_type = [];
-      
+      this.currentCategoryAttr = {}
       this.originAttrData.forEach(el => {
         if (el.attributeId == "variation_theme") skuAttTheme = el;
         if (el.attributeId == "feed_product_type") {
@@ -272,9 +293,7 @@ export default {
         this.radioShow = true
       }else{
         this.radioShow = false
-      }
-      
-      
+      }  
       this.currentCategoryAttr.skuEndemicAttr = skuEndemicAttr;
       this.currentCategoryAttr.skuThemeAttr = skuAttThemeReal;
       this.currentCategoryAttr.product_type = product_type;
