@@ -10,7 +10,7 @@
                 <countrySelect v-model="form.country"></countrySelect>              
             </el-form-item>
             <el-form-item label="目录分类" prop="categoryType">
-              <categoryTypeNode v-model="form.categorySelectPath" @picked="handlePicked" :site="form.country"></categoryTypeNode>  
+              <categoryTypeNode v-model="form.categorySelectPath" @picked="handlePicked" :categorySelectPath="form.categorySelectPath" :site="form.country"></categoryTypeNode>  
             </el-form-item>
             <el-form-item label="分类类型" v-if="splitCategoryTypeAttrOptions.length">
               <el-select placeholder="请选择分类类型" v-model="pickSpiltCategoryTypeAttr">
@@ -28,6 +28,9 @@
                 <el-radio :label="0">单体</el-radio>
                 <el-radio :label="1">多变种</el-radio>
               </el-radio-group>
+            </el-form-item>
+            <el-form-item label="SKU" prop="parentSku">
+              <el-input style="width:800px" v-model="form.parentSku"></el-input>
             </el-form-item>
             <el-form-item label="产品名称" prop="merChanName">
                 <el-input style="width:800px" v-model="form.merChanName"></el-input>
@@ -51,16 +54,16 @@
                 <el-input v-model="form.point1" type="textarea" style="width:800px" :autosize="{ minRows: 2}" maxlength="500" show-word-limit placeholder="请输入重点描述,不能超过500字符"></el-input>
             </el-form-item>
              <el-form-item label="重点描述2" prop="point2">
-                <el-input v-model="form.point1" type="textarea" style="width:800px" :autosize="{ minRows: 2}" maxlength="500" show-word-limit placeholder="请输入重点描述,不能超过500字符"></el-input>
+                <el-input v-model="form.point2" type="textarea" style="width:800px" :autosize="{ minRows: 2}" maxlength="500" show-word-limit placeholder="请输入重点描述,不能超过500字符"></el-input>
             </el-form-item>
              <el-form-item label="重点描述3" prop="point3">
-                <el-input v-model="form.point1" type="textarea" style="width:800px" :autosize="{ minRows: 2}"  maxlength="500" show-word-limit placeholder="请输入重点描述,不能超过500字符"></el-input>
+                <el-input v-model="form.point3" type="textarea" style="width:800px" :autosize="{ minRows: 2}"  maxlength="500" show-word-limit placeholder="请输入重点描述,不能超过500字符"></el-input>
             </el-form-item>
              <el-form-item label="重点描述4" prop="point4">
-                <el-input v-model="form.point1" type="textarea" style="width:800px" :autosize="{ minRows: 2}" maxlength="500" show-word-limit placeholder="请输入重点描述,不能超过500字符"></el-input>
+                <el-input v-model="form.point4" type="textarea" style="width:800px" :autosize="{ minRows: 2}" maxlength="500" show-word-limit placeholder="请输入重点描述,不能超过500字符"></el-input>
             </el-form-item>
              <el-form-item label="重点描述5" prop="point5">
-                <el-input v-model="form.point1" type="textarea" style="width:800px" :autosize="{ minRows: 2}" maxlength="500" show-word-limit placeholder="请输入重点描述,不能超过500字符"></el-input>
+                <el-input v-model="form.point5" type="textarea" style="width:800px" :autosize="{ minRows: 2}" maxlength="500" show-word-limit placeholder="请输入重点描述,不能超过500字符"></el-input>
             </el-form-item>
             <el-form-item label="发布日期" prop="date">
             <el-date-picker
@@ -97,6 +100,9 @@
      
     </el-tabs>
      </el-form>
+     <el-row>
+       <el-button type="primary" @click="submit">提交</el-button>
+     </el-row>
   </section>
 </template>
 <script>
@@ -105,7 +111,7 @@ import attrDetail from './common/attrDetail'
 import categoryTypeNode from './common/categoryTypeNode'
 import countrySelect from './common/countrySelect'
 import { regions,attrData } from "@/common/options.js";
-import {categoryApi} from '@/api';
+import {categoryApi,merchan} from '@/api';
 export default {
     components:{countrySelect,categoryTypeNode,attrDetail,spiderAttrEdit},
   data() {
@@ -116,6 +122,7 @@ export default {
       //是否显示增加变种选择
       radioShow:true,
       form:{
+        parentSku:"",
           brand:'',
           country:'',
           //当前选择的分类
@@ -143,6 +150,9 @@ export default {
           mainImgUrl3:'',
           mainImgUrl4:'',
           mainImgUrl5:'',
+          //变种
+          childAttr:[]
+
       },
       //当前分类如果存在多个属性
       splitCategoryTypeAttrOptions:[],
@@ -192,11 +202,22 @@ export default {
       }
   },
   methods:{
+    //提交数据
+    submit(){
+      merchan.addMer(this.form).then(res => {
+              if (res.code == 1) {
+                this.$Message.success("发布成功");
+                this.$refs['newCommitFrom'].resetFields()
+              } else {
+                this.$Message.error("发布失败");
+              }
+            });
+    },
 		checkQuery(){
 			if(this.$route.query.edit){
 				const form = JSON.parse(sessionStorage.getItem("currentMer"))
 				debugger
-				this.form = Object.assign({},form,this.form)
+				this.form = Object.assign({},this.form,form)
 				debugger
 			}
 		},

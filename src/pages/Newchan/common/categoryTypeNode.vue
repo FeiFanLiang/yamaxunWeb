@@ -13,7 +13,7 @@ export default {
       type: String,
       default: ""
     },
-    picked:{
+    categorySelectPath:{
         type:Array,
         default(){
             return []
@@ -115,19 +115,23 @@ export default {
   computed:{
     pickArray:{
       get(){
-        return [...this.picked]
+        return [...this.categorySelectPath]
       },
       set(val){
         this.$emit('input',val)
       }
     }
   },
+  mounted(){
+
+  },
   watch: {
-      picked:{
+      categorySelectPath:{
           deep:true,
           handler(val){
               if(val.length){
-                this.editPickLoad()
+                debugger
+                this.editPickLoad(val)
               }      
           }
       },
@@ -145,7 +149,7 @@ export default {
           return el;
         });
         this.options = node;
-        
+        debugger
       });
     }
   }
