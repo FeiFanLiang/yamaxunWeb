@@ -10,10 +10,10 @@
                 <countrySelect v-model="form.country"></countrySelect>              
             </el-form-item>
             <el-form-item label="目录分类" prop="categoryType">
-              <categoryTypeNode v-model="form.categorySelectPath" @picked="handlePicked" :categorySelectPath="form.categorySelectPath" :site="form.country"></categoryTypeNode>  
+              <categoryTypeNode ref="category" v-model="form.categorySelectPath" @picked="handlePicked"  :site="form.country"></categoryTypeNode>  
             </el-form-item>
             <el-form-item label="分类类型" v-if="splitCategoryTypeAttrOptions.length">
-              <el-select placeholder="请选择分类类型" v-model="pickSpiltCategoryTypeAttr">
+              <el-select placeholder="请选择分类类型" v-model="form.categoryTypeText">
                 <el-option v-for="(item,index) of splitCategoryTypeAttrOptions" :key="index" :value="item" :label="item"></el-option>
               </el-select>  
             </el-form-item>
@@ -76,8 +76,16 @@
             </el-form-item>
         </el-tab-pane>
         <el-tab-pane label="变种信息" name="second">
-          <attrDetail v-if="attrPickShow" :baseDetail="currentCategoryAttr" :VariType="form.VariType"></attrDetail>
-					<!-- <spiderAttrEdit @editCallback="reSpiderChild"></spiderAttrEdit> -->
+					<div class="attrContainer">
+					<div v-if="!form.spiderChild.length">
+						<h3>变种列表</h3>
+						<attrDetail v-if="attrPickShow" :baseDetail="currentCategoryAttr" :VariType="form.VariType" :attrList="form.childAttr" @childChange="handleChidChange"></attrDetail>	
+					</div>	
+					<div v-if="form.spiderChild.length">
+						<h3>采集变种信息</h3>
+						<spiderAttrEdit @editCallback="reSpiderChild" :formData="form.spiderChild"></spiderAttrEdit>
+					</div>
+					</div>
         </el-tab-pane>
         <el-tab-pane label="图片信息" name="third">
         <el-form-item label="主图链接1">
@@ -111,7 +119,7 @@ import attrDetail from './common/attrDetail'
 import categoryTypeNode from './common/categoryTypeNode'
 import countrySelect from './common/countrySelect'
 import { regions,attrData } from "@/common/options.js";
-import {categoryApi,merchan} from '@/api';
+import {categoryApi,merchan,translateApi} from '@/api';
 export default {
     components:{countrySelect,categoryTypeNode,attrDetail,spiderAttrEdit},
   data() {
@@ -125,16 +133,21 @@ export default {
         parentSku:"",
           brand:'',
           country:'',
-          //当前选择的分类
+          //当前选择的分类ID
           categoryType:'',
           //分类路径
           categorySelectPath:[],
+					//选择的分类类型
+					categoryTypeText:'',
           //是否有变种
           hasVarieta:0,
           //当前选择的变种
           VariType:'',
           //产品名称
           merChanName:'',
+					productType:'',
+					ean:'',
+					model:'',
           price:'',
           keyword:'',
           description:'',
@@ -151,7 +164,9 @@ export default {
           mainImgUrl4:'',
           mainImgUrl5:'',
           //变种
-          childAttr:[]
+          childAttr:[],
+					//采集得到的数据
+					spiderChild:[]
 
       },
       //当前分类如果存在多个属性
@@ -172,7 +187,7 @@ export default {
       'form.country'(val){
 
       },
-      async pickSpiltCategoryTypeAttr(val){
+      async 'form.categoryTypeText'(val){
 				if(!val){
 					return
 				}
@@ -202,12 +217,36 @@ export default {
       }
   },
   methods:{
+		//翻译信息
+		translateForm(){
+			let arr = ['merChanName','description','point1','point2','point3','point4','point5']
+			let promiseArr = []
+			for(let key in this.form){
+				if(arr.indexOf(key) !== -1){
+					debugger
+					let promise = new Promise((reslove,reject) => {
+						const params ={
+							country:this.form.country,
+							query:this.form[key]
+						}
+						translateApi.translate(params).then((res) => {
+							debugger
+						})
+					})
+				}
+			}
+			const {merChanName,description,point1} = this.form
+
+		},
+		handleChidChange(val){
+			this.form.childAttr = val
+		},
     //提交数据
     submit(){
+			this.translateForm()
       merchan.addMer(this.form).then(res => {
               if (res.code == 1) {
                 this.$Message.success("发布成功");
-                this.$refs['newCommitFrom'].resetFields()
               } else {
                 this.$Message.error("发布失败");
               }
@@ -216,9 +255,7 @@ export default {
 		checkQuery(){
 			if(this.$route.query.edit){
 				const form = JSON.parse(sessionStorage.getItem("currentMer"))
-				debugger
 				this.form = Object.assign({},this.form,form)
-				debugger
 			}
 		},
 		reSpiderChild(data){
@@ -233,16 +270,18 @@ export default {
       return `${y}-${m}-${d}`;
     },
     async handlePicked(val){
-			this.pickSpiltCategoryTypeAttr = ''
+			this.$set(this.form,'categoryTypeText','')
 			this.$set(this.form,'productType','')
 			this.splitCategoryTypeAttrOptions = []
       const checkType = val
       this.form.categoryType = checkType.id
+			
       if (checkType.categoryType.indexOf(",") !== -1) {
         //分类存在多个属性的情况,需要再次选择
         this.splitCategoryTypeAttrOptions = checkType.categoryType.split(",");
         return;
       }
+			this.$set(this.form,'categoryTypeText',checkType.categoryType)
       const params = {
         site: val.site,
         categoryType: val.categoryType
@@ -322,3 +361,9 @@ export default {
   }
 };
 </script>
+<style lang="css">
+	.attrContainer{
+		display: flex;
+		flex-direction: column;
+	}
+</style>

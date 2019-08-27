@@ -1,7 +1,7 @@
 <template>
   <section>
     <el-row class="row">
-      <el-select v-model="selectAttr" @change="handleChange" placeholder="请选择变种属性" size="mini">
+      <el-select v-if="baseDetail.skuAttTheme" v-model="selectAttr" @change="handleChange" placeholder="请选择变种属性" size="mini">
         <el-option
           v-for="(value,index) in baseDetail.skuAttTheme.values"
           :key="index"
@@ -250,9 +250,6 @@ export default {
           
         if (el.attributeType == "select") {
             el.addValues = []
-           
-           
-          
           this.allSelectOption.push(el);
         }
         if (el.attributeType == "input") {
@@ -277,14 +274,12 @@ export default {
 				this.selectAttr = ''
 				this.allInputOption= []
 				this.allSelectOption = []
-				
-      
-      }
+      }   
     },
 		attrList:{
 			deep:true,
+			immediate:true,
 			handler(val){
-				this.initNoEditKey()
 				this.formData = JSON.parse(JSON.stringify(val))
 			}
 		}

@@ -17,6 +17,17 @@
 					<el-option v-for="(item,index) of options" :key="index" :label="item" :value="item"></el-option>
 				</el-select>
 			</el-col>
+			<el-col :span="2">
+				<el-col :span="2">
+					<el-input placeholder="筛选字符" v-model="transTarget"></el-input>
+				</el-col>
+				<el-col :span="2">
+					<el-input placeholder="替换字符" v-model="transRuslut"></el-input>
+				</el-col>
+				<el-col :span="2">
+					<el-button type="success" @click="replaceTarget">替换</el-button>
+				</el-col>
+			</el-col>
 		</el-row>
 		<template v-if="spiderData.length">
 				<el-table :data="spiderDate">
@@ -86,10 +97,17 @@ export default {
 				skuName:'',
 				name:''
 			},
+			transTarget:'',
+			transRuslut:'',
 			options:['color_name','size_map','color_map','size_name']
 		}
 	},
 	methods:{
+		replaceTarget(){
+			const dataText = JSON.stringify(this.spiderData)
+			const reg = new RegExp(this.transTarget,'g')
+			this.spiderData = JSON.parse(dataText.replace(reg,`${this.transRuslut}`))
+		},
 		resetAttrMap(){
 			this.attrMap = {
 				skuName:'',
@@ -128,7 +146,10 @@ export default {
 			deep:true,
 			immediate:true,
 			handler(val){
-				this.spiderData = this.initFormData(val)
+				if(val.length){
+					this.spiderData = this.initFormData(val)
+				}
+				
 			}
 		},
 	},
