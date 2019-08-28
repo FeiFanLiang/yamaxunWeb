@@ -307,8 +307,7 @@ export default {
     for(let i=0,l=merchants.length;i<l;i++){
         for(let k in merchants[i]){
             for(let key in table){
-                if(table[key].v == k || table[key].v+'trans' == k){
-                 
+                if(table[key].v == k && !merchants[i][k+'trans']){
                     let index = Number(key.slice(-1))+i+1
                     let cell = key.slice(0,key.length - 1)
                     table[cell+index] = {
@@ -320,7 +319,16 @@ export default {
                   
                   
                     
-                }
+                }else if(table[key].v == k && merchants[i][k+'trans']){
+									let index = Number(key.slice(-1))+i+1
+                    let cell = key.slice(0,key.length - 1)
+                    table[cell+index] = {
+                        t:'s',
+                        v:merchants[i][k+'trans'] || '',
+                        h:merchants[i][k+'trans'] || '',
+                        w:merchants[i][k+'trans'] || ''
+                    }
+								}
             }
         }
         

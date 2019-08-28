@@ -79,11 +79,11 @@
 					<div class="attrContainer">
 					<div v-if="!form.spiderChild.length">
 						<h3>变种列表</h3>
-						<attrDetail v-if="attrPickShow" :baseDetail="currentCategoryAttr" :VariType="form.VariType" :attrList="form.childAttr" @childChange="handleChidChange"></attrDetail>	
+						<attrDetail v-if="attrPickShow" :parentSku="form.parentSku" :baseDetail="currentCategoryAttr" :VariType="form.VariType" :attrList="form.childAttr" @childChange="handleChidChange"></attrDetail>	
 					</div>	
 					<div v-if="form.spiderChild.length">
 						<h3>采集变种信息</h3>
-						<spiderAttrEdit @editCallback="reSpiderChild" :formData="form.spiderChild"></spiderAttrEdit>
+						<spiderAttrEdit @editCallback="reSpiderChild" :parentSku="form.parentSku" :formData="form.spiderChild"></spiderAttrEdit>
 					</div>
 					</div>
         </el-tab-pane>
@@ -120,6 +120,7 @@ import categoryTypeNode from './common/categoryTypeNode'
 import countrySelect from './common/countrySelect'
 import { regions,attrData } from "@/common/options.js";
 import {categoryApi,merchan,translateApi} from '@/api';
+import { mapState } from "vuex";
 export default {
     components:{countrySelect,categoryTypeNode,attrDetail,spiderAttrEdit},
   data() {
@@ -183,6 +184,9 @@ export default {
 	mounted(){
 		this.checkQuery()
 	},
+	computed:{
+		...mapState(["userInfo"])
+	},
   watch:{
       'form.country'(val){
 
@@ -220,7 +224,7 @@ export default {
 		//翻译信息
 		async translateForm(){
 			let arr = ['merChanName','description','point1','point2','point3','point4','point5']
-      let childArr = ['color_name','size_map','color_map','size_name']
+      let childArr = ['sku','price','quantity','imgurl','ean']
 			let promiseArr = []
 			for(let key in this.form){
 				if(arr.indexOf(key) !== -1){
@@ -243,7 +247,7 @@ export default {
       if(this.form.childAttr.length){
         for(let child of this.form.childAttr){
           for(let key in child){
-            if(childArr.indexOf(key) !== -1){
+            if(childArr.indexOf(key) == -1){
               let promise = new Promise((reslove,reject) => {
                 const params = {
                   country:this.form.country,
@@ -281,6 +285,9 @@ export default {
 			if(this.$route.query.edit){
 				const form = JSON.parse(sessionStorage.getItem("currentMer"))
 				this.form = Object.assign({},this.form,form)
+			}else{
+				this.form.brand = this.userInfo.brand;
+				this.form.parentSku = this.form.brand + "-" + this.$uuid()
 			}
 		},
 		reSpiderChild(data){

@@ -9,7 +9,7 @@ import {mapMutations} from 'vuex'
 import {userApi} from '@/api'
 export default {
   name: 'App',
-  mounted(){
+  created(){
     this.getUser()
   },
   

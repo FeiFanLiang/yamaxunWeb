@@ -1,5 +1,5 @@
 <template>
-	 <div class="layout">
+	 <div class="layout" v-if="userInfo">
         <Layout>
             <Header>
                 <Menu mode="horizontal" theme="light">
@@ -63,6 +63,7 @@ export default {
 		...mapState({
         userInfo: state => state.userInfo
       }),
+			
 		router(){
 			return this.$router.options.routes.filter(el =>  el.meta && !el.meta.hidden)
 		},
@@ -71,9 +72,10 @@ export default {
 		}
 	},
 	mounted(){
-	//	console.log(this.$cookies)
+	
 	},
 	methods:{
+		
 		async logout(){
 			await userApi.logout()
 			this.$router.push({

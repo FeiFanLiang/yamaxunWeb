@@ -1,93 +1,100 @@
 <template>
 	<section>
-		<el-row :gutter="20" class="tableContainer">
-			<el-col :span="1">
-				<el-tag>选择name对应的属性</el-tag>
-			</el-col>
-			<el-col :span="2">
-				<el-select v-model="attrMap.name" placeholder="选择name对应属性">
+		<el-row :gutter="2" class="tableContainer" type="flex">
+				<div class="item">
+						<el-tag>选择name对应的属性</el-tag>
+				</div>
+				<div class="item">
+					<el-select v-model="attrMap.name" placeholder="选择name对应属性" size="mini">
 					<el-option v-for="(item,index) of options" :key="index" :label="item" :value="item"></el-option>
 				</el-select>
-			</el-col>
-				<el-col :span="1">
-				<el-tag>选择skuName对应的属性</el-tag>
-			</el-col>
-			<el-col :span="2">
-				<el-select v-model="attrMap.skuName" placeholder="选择skuName对应属性">
+				</div>
+				<div class="item">
+					<el-tag>选择skuName对应的属性</el-tag>
+				</div>
+				<div class="item">
+					<el-select v-model="attrMap.skuName" placeholder="选择skuName对应属性" size="mini">
 					<el-option v-for="(item,index) of options" :key="index" :label="item" :value="item"></el-option>
 				</el-select>
-			</el-col>
-			<el-col :span="2">
-				<el-col :span="2">
-					<el-input placeholder="筛选字符" v-model="transTarget"></el-input>
-				</el-col>
-				<el-col :span="2">
-					<el-input placeholder="替换字符" v-model="transRuslut"></el-input>
-				</el-col>
-				<el-col :span="2">
-					<el-button type="success" @click="replaceTarget">替换</el-button>
-				</el-col>
-			</el-col>
+				</div>
+				<div class="item">
+					<el-input placeholder="筛选字符" v-model="transTarget" size="mini"></el-input>
+				</div>
+				<div class="item">
+					<el-input placeholder="替换字符" v-model="transRuslut" size="mini"></el-input>
+				</div>
+				<div class="item">
+					<el-button type="success" @click="replaceTarget" size="mini">替换</el-button>
+				</div>
+			
+				
+			
+		
+			
 		</el-row>
 		<template v-if="spiderData.length">
-				<el-table :data="spiderDate">
+				<el-table :data="spiderData" border stripe size="mini">
 					<el-table-column label="SKU">
 						<template slot-scope="scope">
-							<el-input v-model="scope.row.sku" disabled></el-input>
+							<el-input v-model="scope.row.sku" disabled size="mini"></el-input>
 						</template>
 					</el-table-column>
 					<el-table-column label="EAN(EAN码)">
 						<template slot-scope="scope">
-							<el-input v-model="scope.row.ean" disabled></el-input>
+							<el-input v-model="scope.row.ean" disabled size="mini"></el-input>
 						</template>
 					</el-table-column>
 					<el-table-column label="name(属性标题)">
 						<template slot-scope="scope">
-							<el-tag>{{attrMap.name}}</el-tag>
-							<el-input v-model="scope.row.name"></el-input>
+							<el-tag v-if="attrMap.name">{{attrMap.name}}</el-tag>
+							<el-input v-model="scope.row.name" size="mini"></el-input>
 						</template>
 					</el-table-column>
 					<el-table-column label="skuName(属性)">
 						<template slot-scope="scope">
-							<el-tag>{{attrMap.skuName}}</el-tag>
-							<el-input v-model="scope.row.skuName"></el-input>
+							<el-tag v-if="attrMap.skuName">{{attrMap.skuName}}</el-tag>
+							<el-input v-model="scope.row.skuName" size="mini"></el-input>
 						</template>
 					</el-table-column>
 					<el-table-column label="price(价格)">
 						<template slot-scope="scope">
-							<el-input v-model="scope.row.price"></el-input>
+							<el-input v-model="scope.row.price" size="mini"></el-input>
 						</template>
 					</el-table-column>
 					<el-table-column label="quality(数量)">
 							<template slot-scope="scope">
-							<el-input v-model="scope.row.quality"></el-input>
+							<el-input v-model="scope.row.quality" size="mini"></el-input>
 						</template>
 					</el-table-column>
 					<el-table-column label="imgurl(变种图片)">
 						<template slot-scope="scope">
-							<el-input v-model="scope.row.imgurl"></el-input>
+							<el-input v-model="scope.row.imgurl" size="mini"></el-input>
 						</template>
 					</el-table-column>
 					<el-table-column label="操作">
 						<template slot-scope="scope">
-							<el-button type="danger" @click="removeChild(scope.$index)">移除</el-button>
+							<el-button type="danger" @click="removeChild(scope.$index)" size="mini">移除</el-button>
 						</template>
 					</el-table-column>
 				</el-table>
 				<el-row>
-					<el-button type="primary" @click="submitData">保存</el-button>
+					<el-button type="primary" @click="submitData" size="mini">保存</el-button>
 				</el-row>
 		</template>
 	</section>
 </template>
 <script>
-export default {
+export default { 
 	props:{
 		formData:{
 			type:Array,
 			default(){
 				return []
 			}
+		},
+		parentSku:{
+			type:String,
+			default:''
 		}
 	},
 	data(){
@@ -138,7 +145,13 @@ export default {
 				sku:'',
 				ean:''
 			}
-			return data.map(el => Object.assign({},el,baseInfo))
+			let a =  data.map(el => Object.assign({},el,baseInfo)).map((el,index) => {
+				let currentindex = index < 9 ? "0" + (index + 1) : index + 1;
+				el.sku = `${this.parentSku}-${currentindex}`;
+				return el
+			})
+			debugger
+			return a 
 		}
 	},
 	watch:{
@@ -161,5 +174,10 @@ export default {
 <style lang="css">
 	.tableContainer{
 		margin: 30px 0;
+	}
+
+	.item{
+
+		margin-right: 20px;
 	}
 </style>

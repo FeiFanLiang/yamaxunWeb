@@ -82,6 +82,10 @@ export default {
 			default(){
 				return []
 			}
+		},
+		parentSku:{
+			type:String,
+			default:''
 		}
   },
   data() {
@@ -129,8 +133,7 @@ export default {
 				'sku': "",
         'price': "",
         'quantity': "",
-        'imgurl':'',
-				'ean':''
+        'imgurl':''
 			}
 			
 			const picked = [...this.allInputOption,...this.allSelectOption].filter(el => el.addValues.length)
@@ -170,7 +173,11 @@ export default {
           }
         });
       }
-			this.formData = attrList.map(el => Object.assign({},baseInfo,el))
+			this.formData = attrList.map(el => Object.assign({},baseInfo,el)).map((el,index) => {
+				let currentindex = index < 9 ? "0" + (index + 1) : index + 1;
+        el.sku = `${this.parentSku}-${currentindex}`;
+				return el
+			})
 		},
 		editAble(key){
 			if(this.noEditKey[key]){
