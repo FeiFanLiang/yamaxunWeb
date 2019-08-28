@@ -218,32 +218,57 @@ export default {
   },
   methods:{
 		//翻译信息
-		translateForm(){
+		async translateForm(){
 			let arr = ['merChanName','description','point1','point2','point3','point4','point5']
+      let childArr = ['color_name','size_map','color_map','size_name']
 			let promiseArr = []
 			for(let key in this.form){
 				if(arr.indexOf(key) !== -1){
-					debugger
+					
 					let promise = new Promise((reslove,reject) => {
 						const params ={
 							country:this.form.country,
 							query:this.form[key]
 						}
 						translateApi.translate(params).then((res) => {
-							debugger
-						})
+							this.form[key+'trans'] = res.data
+              reslove()
+						}).catch(() => {
+              reject()
+            })
 					})
+          promiseArr.push(promise)
 				}
 			}
-			const {merChanName,description,point1} = this.form
-
+      if(this.form.childAttr.length){
+        for(let child of this.form.childAttr){
+          for(let key in child){
+            if(childArr.indexOf(key) !== -1){
+              let promise = new Promise((reslove,reject) => {
+                const params = {
+                  country:this.form.country,
+                  query:child[key]
+                }
+                translateApi.translate(params).then((res) => {
+                  child[key+'trans'] = res.data
+                  reslove()
+                }).catch(() => {
+                  reject()
+                })
+              })
+              promiseArr.push(promise)
+            }
+          }
+        }
+      }
+      await Promise.all(promiseArr)
 		},
 		handleChidChange(val){
 			this.form.childAttr = val
 		},
     //提交数据
-    submit(){
-			this.translateForm()
+    async submit(){
+			await this.translateForm();
       merchan.addMer(this.form).then(res => {
               if (res.code == 1) {
                 this.$Message.success("发布成功");

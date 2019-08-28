@@ -249,17 +249,17 @@ export default {
                 'feed_product_type':el.productType,
                 'item_sku':el.parentSku,
                 'brand_name':el.brand,
-                'item_name':el.merChanName,
-                'recommended_browse_nodes':el.categoryTypeId,
+                'item_name':el['merChanNametrans'],
+                'recommended_browse_nodes':el.categoryType,
                 'standard_price':el.price,
                 'quantity':el.quantity,
-                'product_description':el.description,
+                'product_description':el['descriptiontrans'],
                 'model':el.model,
-                'bullet_point1':el.point1,
-                'bullet_point2':el.point2,
-                'bullet_point3':el.point3,
-                'bullet_point4':el.point4,
-                'bullet_point5':el.point5,
+                'bullet_point1':el['point1trans'],
+                'bullet_point2':el['point2trans'],
+                'bullet_point3':el['point3trans'],
+                'bullet_point4':el['point4trans'],
+                'bullet_point5':el['point5trans'],
                 'generic_keywords':el.keyword,
                 'main_image_url':el.mainImgUrl1,
                 'other_image_url1':el.mainImgUrl2,
@@ -307,7 +307,8 @@ export default {
     for(let i=0,l=merchants.length;i<l;i++){
         for(let k in merchants[i]){
             for(let key in table){
-                if(table[key].v == k){
+                if(table[key].v == k || table[key].v+'trans' == k){
+                 
                     let index = Number(key.slice(-1))+i+1
                     let cell = key.slice(0,key.length - 1)
                     table[cell+index] = {
@@ -316,6 +317,9 @@ export default {
                         h:merchants[i][k] || '',
                         w:merchants[i][k] || ''
                     }
+                  
+                  
+                    
                 }
             }
         }

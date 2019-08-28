@@ -124,15 +124,10 @@ export default {
 		//生成变种数据
 		initChildAttrList(){
 			this.initNoEditKey()
-		
-			
 			const skuEndemicAttr = this.attrObj.skuEndemicAttr
 			let baseInfo = {
 				'sku': "",
-        'conditionNote': "",
         'price': "",
-        // discountPrice: "",
-        // discountDate: "",
         'quantity': "",
         'imgurl':'',
 				'ean':''
