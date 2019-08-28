@@ -20,9 +20,11 @@ export default {
     if(userInfo){
       this.updateUser(userInfo)
     }else{
-      const res = await userApi.userInfo()
+			if(this.$cookies.isKey('__v')){
+				 const res = await userApi.userInfo()
       sessionStorage.setItem('user',JSON.stringify(res.data))
       this.updateUser(res.data)
+			}
     }
     }
   }
