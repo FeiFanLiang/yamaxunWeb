@@ -122,7 +122,7 @@ export default {
 			}
 		},
 		submitData(){
-			const newChild = spiderData.map(el => {
+			const newChild = this.spiderData.map(el => {
 				let obj = {
 					[this.attrMap.skuName]:el.skuName,
 					[this.attrMap.name]:el.name,
@@ -134,6 +134,7 @@ export default {
 				}
 				return obj
 			})
+			
 			this.$emit('editCallback',newChild)
 		},
 		removeChild(index){
@@ -142,16 +143,13 @@ export default {
 		initFormData(data){
 			this.resetAttrMap()
 			let baseInfo = {
-				sku:'',
-				ean:''
+				sku:''
 			}
-			let a =  data.map(el => Object.assign({},el,baseInfo)).map((el,index) => {
+			return data.map(el => Object.assign({},el,baseInfo)).map((el,index) => {
 				let currentindex = index < 9 ? "0" + (index + 1) : index + 1;
 				el.sku = `${this.parentSku}-${currentindex}`;
 				return el
-			})
-			debugger
-			return a 
+			})	
 		}
 	},
 	watch:{

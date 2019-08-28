@@ -205,20 +205,30 @@ export default {
               id:this.exportQuery.id,
               excelName:this.exportQuery.excelName
             }
-            
+             const loading = this.$loading({
+          lock: true,
+          text: '正在生成表格下载',
+          spinner: 'el-icon-loading',
+          background: 'rgba(0, 0, 0, 0.7)'
+        });
+       
             merchan.excelLoad(params).then((res) => {
               if(!res.data.length){
                 this.$Message.error('数据为空')
+                loading.close();
                 return
               }
               if(!res.template){
                 this.$Message.error('模板为空')
+                loading.close();
                 return
               }
               const data = res.data
               const template = res.template.template
               const saveName = params.excelName
+              loading.close();
               this.creatExcelLoad(data,template,saveName)
+              
             })
           }
         })
@@ -267,6 +277,7 @@ export default {
                 'other_image_url3':el.mainImgUrl4,
                 'other_image_url4':el.mainImgUrl5,
                 'country_of_origin':'China',
+                'number_of_items':el.quantity,
                 'condition_type':el.status || this.initStatusFormCountry(el.country)
             }
             if(el.discountDate.length){
@@ -280,6 +291,7 @@ export default {
                     obj['parent_child'] = 'Parent'
                     let children = Object.assign({},obj,child)
                     children['item_sku'] = child.sku
+                    children['quantity'] = child.quantity
                     children['external_product_id'] = child.ean
                     children['external_product_id_type'] = 'EAN'
                     children['model'] = child.model
@@ -288,7 +300,7 @@ export default {
                     children['relationship_type'] = 'Variation'
                     children['variation_theme'] = el.VariType
                     children['number_of_items'] = child.quantity
-                    children['main_image_url'] = el.imgurl
+                    children['main_image_url'] = child.imgurl
                     current.push(children)
                 })
             }else{

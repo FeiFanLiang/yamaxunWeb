@@ -9,9 +9,9 @@
           :label="value"
         ></el-option>
       </el-select>
-      <el-button type="primary" size="mini" @click="initChildAttrList">生成变种类型</el-button>
+      <el-button type="primary" size="mini" @click="initChildAttrList" v-if="show">生成变种类型</el-button>
     </el-row>
-    <template v-if="allInputOption.length"> 
+    <template v-if="allInputOption.length && show"> 
       <el-row class="row" v-for="(item,index) of allInputOption" :key="index">
         <el-col :span="5"><el-tag type="warning">属性名称:{{item.attributeName}}</el-tag> <el-tag type="warning">属性类型:{{item.attributeId}}</el-tag></el-col>
         <el-col :span="15">
@@ -34,7 +34,7 @@
         </el-col>
       </el-row>
     </template>
-    <template v-if="allSelectOption.length">
+    <template v-if="allSelectOption.length && show">
         <el-row class="row" v-for="item of allSelectOption" :key="item.attributeName">
           <el-col :span="5"><el-tag type="warning">属性名称:{{item.attributeName}}</el-tag> <el-tag type="warning">属性类型:{{item.attributeId}}</el-tag></el-col>
           <el-col :span="5">
@@ -44,7 +44,7 @@
           </el-col>
         </el-row>
     </template>
-		<template v-if="formData.length">
+		<template v-if="formData.length && show">
 		
 				<el-table :data="formData" border stripe size="mini">
 					<template v-for="(value,key) in formData[0]">
@@ -86,7 +86,11 @@ export default {
 		parentSku:{
 			type:String,
 			default:''
-		}
+		},
+    show:{
+      type:Boolean,
+      default:true
+    }
   },
   data() {
     return {
@@ -216,6 +220,8 @@ export default {
       this.input[item.attributeName] = ''
     },
     handleChange(val) {
+      const atrr = this.baseDetail.skuAttTheme.attributeName
+      this.$emit('pickedAttr',atrr)
       this.allInputOption = [];
       this.allSelectOption = [];
       let skArr = [];

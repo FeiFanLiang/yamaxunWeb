@@ -28,6 +28,8 @@
             <Cell title="用户等级" :label="userInfo.roleLabel">
               <Button type="text" slot="extra" v-if="userInfo.role" @click="subUserLink">用户管理</Button>
             </Cell>
+            <Cell title="厂家名称" :label="userInfo.Manufacturer">
+            </Cell>
             <!-- <Cell title="商品数量" label="20" /> -->
             <Cell title="注册时间" :label="userInfo.formatCreatTime" />
             <Cell title="密码管理">
@@ -49,12 +51,20 @@
             <Input type="password" v-model="form.newPass" placeholder="请输入新密码"></Input>
           </Form-Item>
         </Row>
-        <Row v-else>
+        <template v-else>
+          <Row>
           <Form-Item label="品牌名称" prop="newBrand">
             <Input type="text" v-model="form.newBrand" placeholder="请输入新的品牌名称"></Input>
           </Form-Item>
         </Row>
-
+        <Row>
+          <Form-Item label="厂家名称" prop="Manufacturer">
+            <Input type="text" v-model="form.Manufacturer" placeholder="请输入新的厂家"></Input>
+          </Form-Item>
+        </Row>
+        </template>
+        
+       
       </Form>
     </Modal>
   </section>
@@ -73,7 +83,8 @@
           oldPass: "",
           newPass: "",
           newBrand: "",
-          isPass: false
+          isPass: false,
+          Manufacturer:''
         },
         marqueeList: [
           "尊敬的用户您好",
@@ -112,6 +123,17 @@
             {
               type: "string",
               min: 1
+            }
+          ],
+          Manufacturer:[
+            {
+              required:true,
+              message:'请输入厂家名称',
+              trigger:'blur'
+            },
+            {
+              type:'string',
+              min:1
             }
           ]
         }
