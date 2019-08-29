@@ -25,6 +25,8 @@
         <Col :span="1">
         <Button type="error" size="small" @click="bathDel">批量删除</Button>
       </Col>
+     
+      
       </template>
     </Row>
     <br />

@@ -44,7 +44,7 @@
           </el-col>
         </el-row>
     </template>
-		<template v-if="formData.length && show">
+		<template v-if="formData.length">
 		
 				<el-table :data="formData" border stripe size="mini">
 					<template v-for="(value,key) in formData[0]">

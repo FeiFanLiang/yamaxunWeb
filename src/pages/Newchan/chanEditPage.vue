@@ -76,9 +76,9 @@
               type="textarea"
               style="width:800px"
               :autosize="{ minRows: 2}"
-              maxlength="250"
+              maxlength="2000"
               show-word-limit
-              placeholder="请输入关键词,不能超过250字符"
+              placeholder="请输入关键词,不能超过2000字符"
             ></el-input>
           </el-form-item>
           <el-form-item label="重点描述1" prop="point1">
@@ -159,7 +159,7 @@
                 :baseDetail="currentCategoryAttr"
                 :VariType="form.VariType"
                 :attrList="form.childAttr"
-                :show="form.spiderChild.length == 0"
+                
                 @childChange="handleChidChange"
                 @pickedAttr="handleVariType"
               ></attrDetail>
@@ -558,12 +558,13 @@ export default {
         this.form = Object.assign({}, this.form, form);
       } else {
         this.form.brand = this.userInfo.brand;
-        this.form.parentSku = this.form.brand + "-" + this.$uuid();
+        this.form.parentSku = (this.form.brand + "-" + this.$uuid()).slice(0,40)
         this.form.Manufacturer = this.userInfo.Manufacturer;
       }
     },
     reSpiderChild(data) {
       this.form.childAttr = data;
+      this.attrPickShow = true
     },
     formatDate(date) {
       let y = date.getFullYear();

@@ -113,7 +113,14 @@ export default {
 		replaceTarget(){
 			const dataText = JSON.stringify(this.spiderData)
 			const reg = new RegExp(this.transTarget,'g')
-			this.spiderData = JSON.parse(dataText.replace(reg,`${this.transRuslut}`))
+			if(this.transTarget.indexOf('?') !== -1 || this.transTarget.indexOf('/') !== -1 || this.transTarget.indexOf('|') !== -1){
+				this.spiderData = this.spiderData.map(el => {
+					return JSON.parse(JSON.stringify(el).replace(this.transTarget,this.transRuslut))
+				})
+			}else{
+				this.spiderData = JSON.parse(dataText.replace(reg,`${this.transRuslut}`))
+			}
+			
 		},
 		resetAttrMap(){
 			this.attrMap = {

@@ -60,13 +60,8 @@ export default new Router({
             path:'editCommit',
             meta:{},
             component: () => import('@/pages/Newchan/chanEditPage')
-        },
-    {
-        name:'dd',
-        path:'ccc',
-        meta:{},
-        component:() =>import('@/pages/Newchan/newchan')
-    }]
+        }
+]
         },
         {
             name: '登录页面',
