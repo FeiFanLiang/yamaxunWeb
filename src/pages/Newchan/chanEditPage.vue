@@ -223,6 +223,7 @@ export default {
         categorySelectPath: [],
         //选择的分类类型
         categoryTypeText: "",
+				parentCategoryTypeId:'',
         //是否有变种
         hasVarieta: 0,
         //当前选择的变种
@@ -577,8 +578,8 @@ export default {
       this.$set(this.form, "productType", "");
       this.splitCategoryTypeAttrOptions = [];
       const checkType = val;
-      this.form.categoryType = checkType.id;
-
+      this.form.categoryType = checkType.categoryId;
+			this.form.parentCategoryTypeId = checkType.nodePathId.split('/')[0]
       if (checkType.categoryType.indexOf(",") !== -1) {
         //分类存在多个属性的情况,需要再次选择
         this.splitCategoryTypeAttrOptions = checkType.categoryType.split(",");
