@@ -25,7 +25,9 @@
         <Col :span="1">
         <Button type="error" size="small" @click="bathDel">批量删除</Button>
       </Col>
-     
+     <Col :span="1">
+        <Button type="error" size="small" @click="dialogFormVisible=true">批量编辑</Button>
+      </Col>
       
       </template>
     </Row>
@@ -39,6 +41,52 @@
     <Row type="flex" justify="center">
         <Page  :current="current" :page-size="30" :total="total" @on-change="getMerList" show-total />
     </Row>
+    <el-dialog title="批量编辑分类信息" :visible.sync="dialogFormVisible">
+      <el-form size="mini">
+        <el-form-item label="站点">
+          <countrySelect v-model="categoryAttr.country" size="mini"></countrySelect>
+        </el-form-item>
+        <el-form-item label="目录">
+          <categoryTypeNode v-model="categoryAttr.categorySelectPath"
+              @picked="handlePicked"
+              :site="categoryAttr.country"></categoryTypeNode>
+        </el-form-item>
+        <el-form-item label="分类类型" v-if="splitCategoryTypeAttrOptions.length">
+          <el-select placeholder="请选择分类类型" v-model="categoryAttr.categoryTypeText">
+              <el-option
+                v-for="(item,index) of splitCategoryTypeAttrOptions"
+                :key="index"
+                :value="item"
+                :label="item"
+              ></el-option>
+            </el-select>
+        </el-form-item>
+        <el-form-item label="产品类型">
+           <el-select v-model="categoryAttr.productType" placeholder="请选择产品分类" v-loading="productTypeLoading">
+              <el-option
+                v-for="(item,index) of currentCategoryAttr.product_type"
+                :key="index"
+                :label="item"
+                :value="item"
+              ></el-option>
+            </el-select>
+        </el-form-item>
+        <el-form-item label="变种属性" v-if="currentCategoryAttr.skuAttTheme">
+          <el-select  v-model="selectAttr" @change="handleChange" placeholder="请选择变种属性" size="mini">
+        <el-option
+          v-for="(value,index) in currentCategoryAttr.skuAttTheme.values"
+          :key="index"
+          :value="value"
+          :label="value"
+        ></el-option>
+      </el-select>
+        </el-form-item>
+      </el-form>
+  <div slot="footer" class="dialog-footer">
+    <el-button @click="dialogFormVisible = false">取 消</el-button>
+    <el-button type="primary" @click="bathCategoryType">确 定</el-button>
+  </div>
+</el-dialog>
     <Modal
         v-model="modalShow"
         title="导出表格"
@@ -69,18 +117,25 @@
 import { merchan,categoryApi} from "@/api";
 import xlsx from 'xlsx';
 import xlsxStyle from 'xlsx-style';
-import {regions} from '@/common/options.js';
+import {regions,attrData} from '@/common/options.js';
 import childChan from './childChanList.vue';
-
+import countrySelect from '@/pages/Newchan/common/countrySelect'
+import categoryTypeNode from '@/pages/Newchan/common/categoryTypeNode'
 export default {
-  comments:{
-      childChan
+  components:{
+      childChan,
+      countrySelect,
+      categoryTypeNode
   },
   data() {
     return {
+      dialogFormVisible:false,
+      productTypeLoading:false,
       modalShow:false,
       modalLoading:false,
       selectLoading:false,
+      attrData:attrData,
+      selectAttr:'',
         selectArr:[],
         current:1,
         total:0,
@@ -92,6 +147,14 @@ export default {
            merChanName:'', 
            creatTime:'',
            excelName:''
+        },
+        categoryAttr:{
+          country:"",
+          categoryType:'',
+          categoryTypeText:"",
+          parentCategoryTypeId:'',
+          productType:'',
+          VariType:""
         },
         exportQuery:{
           id:'',
@@ -166,14 +229,136 @@ export default {
           }
         ]
       },
-     formList:[]
+     formList:[],
+     
+     splitCategoryTypeAttrOptions:[],
+     currentCategoryAttr:{}
     };
   },
   mounted() {
       this.fetchData()
       this.reciverQuery()
   },
+  watch:{
+    async "categoryAttr.categoryTypeText"(val) {
+      if (!val) {
+        return;
+      }
+      const params = {
+        site: this.categoryAttr.country,
+        categoryType: val
+      };
+      this.productTypeLoading = true
+      await this.fetchAttrData(params);
+      this.initAttrOptions();
+      this.productTypeLoading = false
+    }
+  },
   methods: {
+    handleChange(val){
+      const atrr = this.currentCategoryAttr.skuAttTheme.attributeName
+      this.categoryAttr.VariType = atrr
+    },
+    async handlePicked(val) {
+      this.$set(this.categoryAttr, "categoryTypeText", "");
+      this.$set(this.categoryAttr, "productType", "");
+      this.splitCategoryTypeAttrOptions = [];
+      const checkType = val;
+      this.categoryAttr.categoryType = checkType.categoryId;
+			this.categoryAttr.parentCategoryTypeId = checkType.nodePathId.split('/')[0]
+      if (checkType.categoryType.indexOf(",") !== -1) {
+        //分类存在多个属性的情况,需要再次选择
+        this.splitCategoryTypeAttrOptions = checkType.categoryType.split(",");
+        debugger
+        return;
+      }
+      this.$set(this.categoryAttr, "categoryTypeText", checkType.categoryType);
+      const params = {
+        site: val.site,
+        categoryType: val.categoryType
+      };
+      this.productTypeLoading = true
+      await this.fetchAttrData(params);
+      this.initAttrOptions();
+      this.productTypeLoading = false
+    },
+    async fetchAttrData(params) {
+      const res = await categoryApi.getCategoryList(params);
+      this.originAttrData = res.data;
+    },
+    initAttrOptions() {
+      let skuAttTheme = "";
+      let skuAttThemeArr = [];
+      let skuAttThemeReal = {};
+      let skuEndemicAttr = [];
+      let product_type = [];
+      this.currentCategoryAttr = {};
+      this.originAttrData.forEach(el => {
+        if (el.attributeId == "variation_theme") skuAttTheme = el;
+        if (el.attributeId == "feed_product_type") {
+          product_type = JSON.parse(el.values);
+        }
+        if (attrData.skuNotDisplay.indexOf(el.attributeId) === -1) {
+          if (el.variantionSpecifics === 1) {
+            skuEndemicAttr.push(el);
+          }
+          skuAttThemeArr.push(el);
+        }
+      });
+      if (skuAttTheme) {
+        let theme = skuAttTheme.values;
+        if (theme) {
+          const themeValus = JSON.parse(theme);
+          let skArr = [];
+          skuAttThemeArr.forEach(sku => {
+            themeValus.forEach(theme => {
+              if (theme.indexOf("/") !== -1 || theme.indexOf("-") !== -1) {
+                if (theme.indexOf("/") !== -1) skArr = theme.split("/");
+                if (theme.indexOf("-") !== -1) skArr = theme.split("-");
+              } else {
+                skArr.push(theme);
+              }
+              if (skArr.length > 0) {
+                skArr.forEach(el => {
+                  let names = el
+                    ? attrData.skuAttrRelation[el.toLowerCase()]
+                    : "";
+                  if (names) {
+                    names.forEach(name => {
+                      if (sku.attributeId === name && !skuAttThemeReal[name]) {
+                        skuAttThemeReal[name] = sku;
+                      }
+                    });
+                  }
+                });
+              }
+            });
+          });
+        }
+      }
+      if (skuAttTheme) {
+        skuAttTheme.values = JSON.parse(skuAttTheme.values);
+        this.currentCategoryAttr.skuAttTheme = skuAttTheme;
+      //  this.radioShow = true;
+      } else {
+      //  this.radioShow = false;
+      }
+      this.currentCategoryAttr.skuEndemicAttr = skuEndemicAttr;
+      this.currentCategoryAttr.skuThemeAttr = skuAttThemeReal;
+      this.currentCategoryAttr.product_type = product_type;
+      debugger
+    },
+    bathCategoryType(){
+    //  categoryAttr:{
+    //       country:"",
+    //       categoryType:'',
+    //       categoryTypeText:"",
+    //       parentCategoryTypeId:'',
+    //       productType:'',
+    //       VariType:""
+    //     },
+    
+    },
       pickDate(val){
         this.exportQuery.dateRange = val
       },

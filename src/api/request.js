@@ -2,8 +2,8 @@ import axios from 'axios'
 import {
     Message,
 } from 'iview';
-const baseURL = 'http://www.amazonvvip.com/api'
-//const baseURL = 'http://127.0.0.1:7001/api'
+//const baseURL = 'http://www.amazonvvip.com/api'
+const baseURL = 'http://127.0.0.1:7001/api'
 const server = axios.create({
     baseURL,
     timeout: 8000,
