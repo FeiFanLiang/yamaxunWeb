@@ -221,7 +221,7 @@ export default {
     },
     handleChange(val) {
       const atrr = this.baseDetail.skuAttTheme.attributeName
-      this.$emit('pickedAttr',atrr)
+      this.$emit('pickedAttr',val)
       this.allInputOption = [];
       this.allSelectOption = [];
       let skArr = [];

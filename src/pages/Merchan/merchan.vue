@@ -51,7 +51,7 @@
               @picked="handlePicked"
               :site="categoryAttr.country"></categoryTypeNode>
         </el-form-item>
-        <el-form-item label="分类类型" v-if="splitCategoryTypeAttrOptions.length">
+      <!--  <el-form-item label="分类类型" v-if="splitCategoryTypeAttrOptions.length">
           <el-select placeholder="请选择分类类型" v-model="categoryAttr.categoryTypeText">
               <el-option
                 v-for="(item,index) of splitCategoryTypeAttrOptions"
@@ -80,8 +80,8 @@
           :label="value"
         ></el-option>
       </el-select>
-        </el-form-item>
-        <el-form-item label="操作">
+        </el-form-item> -->
+                <el-form-item label="操作">
           <el-button type="primary" @click="addBatchData">添加</el-button>
         </el-form-item>
       </el-form>
@@ -122,13 +122,14 @@
   </section>
 </template>
 <script>
-import { merchan,categoryApi} from "@/api";
+import { merchan,categoryApi,translateApi} from "@/api";
 import xlsx from 'xlsx';
 import xlsxStyle from 'xlsx-style';
 import {regions,attrData} from '@/common/options.js';
 import childChan from './childChanList.vue';
 import countrySelect from '@/pages/Newchan/common/countrySelect'
 import categoryTypeNode from '@/pages/Newchan/common/categoryTypeNode'
+import {mapState} from 'vuex';
 export default {
   components:{
       childChan,
@@ -158,11 +159,12 @@ export default {
         },
         categoryAttr:{
           country:"",
+          categorySelectPath:[],
           categoryType:'',
-          categoryTypeText:"",
-          parentCategoryTypeId:'',
-          productType:'',
-          VariType:""
+          // categoryTypeText:"",
+           parentCategoryTypeId:'',
+          // productType:'',
+          // VariType:""
         },
         batchCategorySave:[],
         exportQuery:{
@@ -248,6 +250,9 @@ export default {
       this.fetchData()
       this.reciverQuery()
   },
+  computed:{
+    ...mapState(["userInfo"])
+  },
   watch:{
     async "categoryAttr.categoryTypeText"(val) {
       if (!val) {
@@ -271,7 +276,7 @@ export default {
       this.batchCategorySave.splice(index,1)
     },
     //翻译
-    async translateForm() {
+    async translateForm(data) {
       let arr = [
         "merChanName",
         "description",
@@ -291,17 +296,17 @@ export default {
         "size_name"
       ];
       let promiseArr = [];
-      for (let key in this.form) {
+      for (let key in data) {
         if (arr.indexOf(key) !== -1) {
           let promise = new Promise((reslove, reject) => {
             const params = {
-              country: this.form.country,
-              query: this.form[key]
+              country: data.country,
+              query: data[key]
             };
             translateApi
               .translate(params)
               .then(res => {
-                this.form[key + "trans"] = res.data;
+                data[key + "trans"] = res.data;
                 reslove();
               })
               .catch(() => {
@@ -311,13 +316,13 @@ export default {
           promiseArr.push(promise);
         }
       }
-      if (this.form.childAttr.length) {
-        for (let child of this.form.childAttr) {
+      if (data.childAttr.length) {
+        for (let child of data.childAttr) {
           for (let key in child) {
             if (childArr.indexOf(key) == -1) {
               let promise = new Promise((reslove, reject) => {
                 const params = {
-                  country: this.form.country,
+                  country: data.country,
                   query: child[key]
                 };
                 translateApi
@@ -336,6 +341,7 @@ export default {
         }
       }
       await Promise.all(promiseArr);
+      return data
     },
     handleChange(val){
       const atrr = this.currentCategoryAttr.skuAttTheme.attributeName
@@ -343,13 +349,15 @@ export default {
     },
     async handlePicked(val) {
       this.$set(this.categoryAttr, "categoryTypeText", "");
-      this.$set(this.categoryAttr, "productType", "");
-      this.$set(this.categoryAttr,'VariType','')
-      this.selectAttr = ''
-      this.splitCategoryTypeAttrOptions = [];
-      const checkType = val;
+      
+      // this.$set(this.categoryAttr, "productType", "");
+      // this.$set(this.categoryAttr,'VariType','')
+      // this.selectAttr = ''
+      // this.splitCategoryTypeAttrOptions = [];
+       const checkType = val;
       this.categoryAttr.categoryType = checkType.categoryId;
 			this.categoryAttr.parentCategoryTypeId = checkType.nodePathId.split('/')[0]
+      return
       if (checkType.categoryType.indexOf(",") !== -1) {
         //分类存在多个属性的情况,需要再次选择
         this.splitCategoryTypeAttrOptions = checkType.categoryType.split(",");
@@ -431,8 +439,22 @@ export default {
       this.currentCategoryAttr.skuThemeAttr = skuAttThemeReal;
       this.currentCategoryAttr.product_type = product_type;
     },
-    bathCategoryType(){
-    this.batchCategorySave
+    async bathCategoryType(){
+      const loading = this.$loading({
+            lock: true,
+            text: "翻译上传中",
+            spinner: "el-icon-loading",
+            background: "rgba(0, 0, 0, 0.7)"
+          });
+     
+      if(this.selectArr.length == 0){
+        this.$Message.error('请先选择')
+        return
+      }
+   if(this.selectArr.find(el => !el.country)){
+     this.$Message.error('请先进行编辑再批量修改')
+     return
+   }
     let merList = []
     for(let mer of this.selectArr){
       for(let categorySave of this.batchCategorySave){
@@ -440,11 +462,38 @@ export default {
         let newMer = Object.assign({},mer,categorySave)
         delete newMer._id
         delete newMer.uuid
+        newMer.parentSku = (newMer.brand + "-" + this.$uuid()).slice(0,40)
+        newMer.Manufacturer = this.userInfo.Manufacturer;
+        if(newMer.childAttr.length){
+          newMer.childAttr.forEach((el,index) => {
+            let currentindex = index < 9 ? "0" + (index + 1) : index + 1;
+        el.sku = `${newMer.parentSku}-${currentindex}`;
+          })
+        }
         merList.push(newMer)
       }
     }
-    debugger
     
+    let promiseArr = []
+    for(let mer of merList){
+        let promise = new Promise((reslove,reject) => {
+           this.translateForm(mer).then((data) => {
+             merchan
+              .addMer(data).then((res) => {
+                reslove()
+              }).catch(() => {
+                reject()
+              })
+           }).catch(() => {
+             reject()
+           })
+        })
+        promiseArr.push(promise)
+      
+    }
+    await Promise.all(promiseArr)
+    loading.close()
+    this.getMerList()
     },
       pickDate(val){
         this.exportQuery.dateRange = val

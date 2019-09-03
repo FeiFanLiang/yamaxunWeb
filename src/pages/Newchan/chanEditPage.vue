@@ -438,7 +438,7 @@ export default {
         "point2",
         "point3",
         "point4",
-        "point5"
+        "point5"  
       ];
       let childArr = [
         "sku",
@@ -510,9 +510,9 @@ export default {
             background: "rgba(0, 0, 0, 0.7)"
           });
           if (this.$route.query.edit) {
-            if (!this.form.merChanNametrans) {
+           
               await this.translateForm();
-            }
+            
             merchan
               .updateMer(this.form)
               .then(res => {
