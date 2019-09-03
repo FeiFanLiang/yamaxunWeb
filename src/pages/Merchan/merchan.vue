@@ -81,7 +81,15 @@
         ></el-option>
       </el-select>
         </el-form-item>
+        <el-form-item label="操作">
+          <el-button type="primary" @click="addBatchData">添加</el-button>
+        </el-form-item>
       </el-form>
+      <el-row>
+        <el-tag v-for="(item,index) of batchCategorySave" :key="index" closable
+  :disable-transitions="false"
+  @close="handleClose(index)">{{item.country}}</el-tag>
+      </el-row>
   <div slot="footer" class="dialog-footer">
     <el-button @click="dialogFormVisible = false">取 消</el-button>
     <el-button type="primary" @click="bathCategoryType">确 定</el-button>
@@ -156,6 +164,7 @@ export default {
           productType:'',
           VariType:""
         },
+        batchCategorySave:[],
         exportQuery:{
           id:'',
           dateRange:[]
@@ -255,6 +264,79 @@ export default {
     }
   },
   methods: {
+    addBatchData(){
+      this.batchCategorySave.push(Object.assign({},this.categoryAttr))
+    },
+    handleClose(index){
+      this.batchCategorySave.splice(index,1)
+    },
+    //翻译
+    async translateForm() {
+      let arr = [
+        "merChanName",
+        "description",
+        "point1",
+        "point2",
+        "point3",
+        "point4",
+        "point5"
+      ];
+      let childArr = [
+        "sku",
+        "price",
+        "quantity",
+        "imgurl",
+        "ean",
+        "size_map",
+        "size_name"
+      ];
+      let promiseArr = [];
+      for (let key in this.form) {
+        if (arr.indexOf(key) !== -1) {
+          let promise = new Promise((reslove, reject) => {
+            const params = {
+              country: this.form.country,
+              query: this.form[key]
+            };
+            translateApi
+              .translate(params)
+              .then(res => {
+                this.form[key + "trans"] = res.data;
+                reslove();
+              })
+              .catch(() => {
+                reject();
+              });
+          });
+          promiseArr.push(promise);
+        }
+      }
+      if (this.form.childAttr.length) {
+        for (let child of this.form.childAttr) {
+          for (let key in child) {
+            if (childArr.indexOf(key) == -1) {
+              let promise = new Promise((reslove, reject) => {
+                const params = {
+                  country: this.form.country,
+                  query: child[key]
+                };
+                translateApi
+                  .translate(params)
+                  .then(res => {
+                    child[key + "trans"] = res.data;
+                    reslove();
+                  })
+                  .catch(() => {
+                    reject();
+                  });
+              });
+              promiseArr.push(promise);
+            }
+          }
+        }
+      }
+      await Promise.all(promiseArr);
+    },
     handleChange(val){
       const atrr = this.currentCategoryAttr.skuAttTheme.attributeName
       this.categoryAttr.VariType = atrr
@@ -262,6 +344,8 @@ export default {
     async handlePicked(val) {
       this.$set(this.categoryAttr, "categoryTypeText", "");
       this.$set(this.categoryAttr, "productType", "");
+      this.$set(this.categoryAttr,'VariType','')
+      this.selectAttr = ''
       this.splitCategoryTypeAttrOptions = [];
       const checkType = val;
       this.categoryAttr.categoryType = checkType.categoryId;
@@ -269,7 +353,6 @@ export default {
       if (checkType.categoryType.indexOf(",") !== -1) {
         //分类存在多个属性的情况,需要再次选择
         this.splitCategoryTypeAttrOptions = checkType.categoryType.split(",");
-        debugger
         return;
       }
       this.$set(this.categoryAttr, "categoryTypeText", checkType.categoryType);
@@ -343,20 +426,24 @@ export default {
       } else {
       //  this.radioShow = false;
       }
+      
       this.currentCategoryAttr.skuEndemicAttr = skuEndemicAttr;
       this.currentCategoryAttr.skuThemeAttr = skuAttThemeReal;
       this.currentCategoryAttr.product_type = product_type;
-      debugger
     },
     bathCategoryType(){
-    //  categoryAttr:{
-    //       country:"",
-    //       categoryType:'',
-    //       categoryTypeText:"",
-    //       parentCategoryTypeId:'',
-    //       productType:'',
-    //       VariType:""
-    //     },
+    this.batchCategorySave
+    let merList = []
+    for(let mer of this.selectArr){
+      for(let categorySave of this.batchCategorySave){
+        if(!mer || !categorySave) return
+        let newMer = Object.assign({},mer,categorySave)
+        delete newMer._id
+        delete newMer.uuid
+        merList.push(newMer)
+      }
+    }
+    debugger
     
     },
       pickDate(val){
