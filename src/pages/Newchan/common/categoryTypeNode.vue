@@ -1,5 +1,5 @@
 <template>
- <el-cascader v-loading="load" style="width:800px" ref="case" :props="prop" :options="options" v-model="pickArray" clearable @change="handleChange" placeholder="选择商品分类目录"></el-cascader>
+ <el-cascader  id="cascader" v-loading="load" style="width:800px" ref="case" :props="prop" :options="options" v-model="pickArray" clearable @change="handleChange" placeholder="选择商品分类目录"></el-cascader>
 </template>
 <script>
  import { categoryApi } from "@/api";
@@ -154,3 +154,8 @@
   }
  };
 </script>
+<style lang="css">
+   .el-cascader-node__label{
+    max-width: 350px;
+  }
+</style>

@@ -57,8 +57,17 @@
 					<el-table-column label="操作">
 						<template slot-scope="scope">
 							<el-button type="danger" size="mini" @click="removeChild(scope.$index)">移除</el-button>
+               <el-tooltip class="item" effect="dark"  placement="top">
+               <div slot="content">
+                <div class="imgWrap">
+                <img :src="scope.row.imgurl" alt="">
+                </div>
+               </div>
+      <el-button>图片预览</el-button>
+    </el-tooltip>
 						</template>
 					</el-table-column>
+          
 				</el-table>
 		</template>
   </section>

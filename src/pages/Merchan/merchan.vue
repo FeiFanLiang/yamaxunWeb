@@ -585,7 +585,6 @@ export default {
                 'item_name':el['merChanNametrans'],
                 'recommended_browse_nodes':el.categoryType,
                 'standard_price':el.price,
-                'quantity':el.quantity,
                 'product_description':el['descriptiontrans'],
                 'model':el.model,
                 'bullet_point1':el['point1trans'],
@@ -599,6 +598,9 @@ export default {
                 'other_image_url2':el.mainImgUrl3,
                 'other_image_url3':el.mainImgUrl4,
                 'other_image_url4':el.mainImgUrl5,
+                'other_image_url5':el.mainImgUrl6,
+                'other_image_url6':el.mainImgUrl7,
+                'other_image_url7':el.mainImgUrl8,
                 'country_of_origin':'China',
                 'number_of_items':el.quantity,
                 'condition_type':el.status || this.initStatusFormCountry(el.country)

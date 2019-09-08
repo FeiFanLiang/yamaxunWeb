@@ -1,6 +1,6 @@
 <template>
   <section>
-    <el-form :model="form" ref="form" label-width="80px" size="mini" :rules="rules">
+    <el-form :model="form" ref="form" label-width="90px" size="mini" :rules="rules">
       <el-tabs v-model="activeName">
         <el-tab-pane label="基础信息" name="first">
           <el-form-item label="品牌信息" prop="brand" style="width:300px">
@@ -176,20 +176,184 @@
         </el-tab-pane>
         <el-tab-pane label="图片信息" name="third">
           <el-form-item label="主图链接1">
-            <el-input v-model="form.mainImgUrl1" placeholder="主图片1链接"></el-input>
+          <el-row :gutter="20">
+            <el-col :span="16">
+              <el-input v-model="form.mainImgUrl1" placeholder="主图片1链接"></el-input>
+            </el-col>
+            <el-col :span="6">
+              <el-tooltip class="item" effect="dark"  placement="top">
+               <div slot="content">
+                <div class="imgWrap">
+                <img :src="form.mainImgUrl1" alt="">
+                </div>
+               </div>
+      <el-button>图片预览</el-button>
+    </el-tooltip>
+            </el-col>
+          </el-row>
+            
+          </el-form-item>
+         <el-form-item label="主图链接2">
+          <el-row :gutter="20">
+            <el-col :span="16">
+              <el-input v-model="form.mainImgUrl2" placeholder="主图片2链接"></el-input>
+            </el-col>
+            <el-col :span="6">
+              <el-tooltip class="item" effect="dark"  placement="top">
+               <div slot="content">
+                <div class="imgWrap">
+                <img :src="form.mainImgUrl2" alt="">
+                </div>
+               </div>
+      <el-button>图片预览</el-button>
+    </el-tooltip>
+            </el-col>
+          </el-row>
+            
           </el-form-item>
           <el-form-item label="主图链接2">
-            <el-input v-model="form.mainImgUrl2" placeholder="主图片2链接"></el-input>
+          <el-row :gutter="20">
+            <el-col :span="16">
+              <el-input v-model="form.mainImgUrl2" placeholder="主图片2链接"></el-input>
+            </el-col>
+            <el-col :span="6">
+              <el-tooltip class="item" effect="dark"  placement="top">
+               <div slot="content">
+                <div class="imgWrap">
+                <img :src="form.mainImgUrl2" alt="">
+                </div>
+               </div>
+      <el-button>图片预览</el-button>
+    </el-tooltip>
+            </el-col>
+          </el-row>
+            
           </el-form-item>
           <el-form-item label="主图链接3">
-            <el-input v-model="form.mainImgUrl3" placeholder="主图片3链接"></el-input>
+          <el-row :gutter="20">
+            <el-col :span="16">
+              <el-input v-model="form.mainImgUrl3" placeholder="主图片3链接"></el-input>
+            </el-col>
+            <el-col :span="6">
+              <el-tooltip class="item" effect="dark"  placement="top">
+               <div slot="content">
+                <div class="imgWrap">
+                <img :src="form.mainImgUrl3" alt="">
+                </div>
+               </div>
+      <el-button>图片预览</el-button>
+    </el-tooltip>
+            </el-col>
+          </el-row>
+            
           </el-form-item>
           <el-form-item label="主图链接4">
-            <el-input v-model="form.mainImgUrl4" placeholder="主图片4链接"></el-input>
+          <el-row :gutter="20">
+            <el-col :span="16">
+              <el-input v-model="form.mainImgUrl4" placeholder="主图片4链接"></el-input>
+            </el-col>
+            <el-col :span="6">
+              <el-tooltip class="item" effect="dark"  placement="top">
+               <div slot="content">
+                <div class="imgWrap">
+                <img :src="form.mainImgUrl4" alt="">
+                </div>
+               </div>
+      <el-button>图片预览</el-button>
+    </el-tooltip>
+            </el-col>
+          </el-row>
+            
           </el-form-item>
           <el-form-item label="主图链接5">
-            <el-input v-model="form.mainImgUrl5" placeholder="主图片5链接"></el-input>
+          <el-row :gutter="20">
+            <el-col :span="16">
+              <el-input v-model="form.mainImgUrl5" placeholder="主图片5链接"></el-input>
+            </el-col>
+            <el-col :span="6">
+              <el-tooltip class="item" effect="dark"  placement="top">
+               <div slot="content">
+                <div class="imgWrap">
+                <img :src="form.mainImgUrl5" alt="">
+                </div>
+               </div>
+      <el-button>图片预览</el-button>
+    </el-tooltip>
+            </el-col>
+          </el-row>
+            
           </el-form-item>
+          <el-form-item label="主图链接6">
+          <el-row :gutter="20">
+            <el-col :span="16">
+              <el-input v-model="form.mainImgUrl6" placeholder="主图片6链接"></el-input>
+            </el-col>
+            <el-col :span="6">
+              <el-tooltip class="item" effect="dark"  placement="top">
+               <div slot="content">
+                <div class="imgWrap">
+                <img :src="form.mainImgUrl6" alt="">
+                </div>
+               </div>
+      <el-button>图片预览</el-button>
+    </el-tooltip>
+            </el-col>
+          </el-row>
+            
+          </el-form-item>
+          <el-form-item label="主图链接7">
+          <el-row :gutter="20">
+            <el-col :span="16">
+              <el-input v-model="form.mainImgUrl7" placeholder="主图片7链接"></el-input>
+            </el-col>
+            <el-col :span="6">
+              <el-tooltip class="item" effect="dark"  placement="top">
+               <div slot="content">
+                <div class="imgWrap">
+                <img :src="form.mainImgUrl7" alt="">
+                </div>
+               </div>
+      <el-button>图片预览</el-button>
+    </el-tooltip>
+            </el-col>
+          </el-row>
+            
+          </el-form-item>
+          <el-form-item label="主图链接8">
+          <el-row :gutter="20">
+            <el-col :span="16">
+              <el-input v-model="form.mainImgUrl8" placeholder="主图片8链接"></el-input>
+            </el-col>
+            <el-col :span="6">
+              <el-tooltip class="item" effect="dark"  placement="top">
+               <div slot="content">
+                <div class="imgWrap">
+                <img :src="form.mainImgUrl8" alt="">
+                </div>
+               </div>
+      <el-button>图片预览</el-button>   
+    </el-tooltip>
+            </el-col>
+          </el-row>
+            
+          </el-form-item>
+        </el-tab-pane>
+        <el-tab-pane label="图片管理" name="four">
+          <el-upload
+  action="http://www.amazonvvip.com/api/uploadImg"
+  list-type="picture-card"
+  :file-list="newImg"
+  :on-preview="handlePictureCardPreview"
+  :on-remove="handleRemove"
+  :on-success="handleUpload">
+  <i class="el-icon-plus"></i>
+</el-upload>
+<el-dialog :visible.sync="imgDialog">
+  <img width="100%" :src="dialogImageUrl">
+</el-dialog>
+<div class="urlList">
+<span v-for="(item,index) of newImg" :key="index">上传图片链接{{index+1}}: {{item.response.data.url}}</span>
+</div>
         </el-tab-pane>
       </el-tabs>
     </el-form>
@@ -207,11 +371,16 @@ export default {
   components: { countrySelect, categoryTypeNode, attrDetail, spiderAttrEdit },
   data() {
     return {
+      imgDialog:false,
+       dialogImageUrl: '',
+        dialogVisible: false,
       activeName: "first",
       //固定数据
       attrData: attrData,
       //是否显示增加变种选择
       radioShow: true,
+      newImg:[],
+      dialogImageUrl:'',
       form: {
         parentSku: "",
         brand: "",
@@ -250,6 +419,9 @@ export default {
         mainImgUrl3: "",
         mainImgUrl4: "",
         mainImgUrl5: "",
+        mainImgUrl6: "",
+        mainImgUrl7: "",
+        mainImgUrl8: "",
         //变种
         childAttr: [],
         //采集得到的数据
@@ -409,6 +581,28 @@ export default {
     }
   },
   methods: {
+    handleUpload(response,file,fileList){
+      debugger
+      if(response.code == 1){
+        this.$message.success('图片上传成功')
+        this.newImg = fileList
+      }
+      
+    },
+    uploadImg(params){
+      params
+      debugger
+    },
+    handlePictureCardPreview(file) {
+        this.dialogImageUrl = file.url;
+        this.imgDialog = true;
+      },
+     handleRemove(file, fileList) {
+        console.log(file, fileList);
+      },
+      handlePreview(file) {
+        console.log(file);
+      },
     initStatusFormCountry(country){
        if(country == 'de'){
            return 'Neu'
@@ -558,7 +752,7 @@ export default {
         this.form = Object.assign({}, this.form, form);
       } else {
         this.form.brand = this.userInfo.brand;
-        this.form.parentSku = (this.form.brand + "-" + this.$uuid()).slice(0,40)
+        this.form.parentSku = (this.form.brand + "-" + this.$uuid()).slice(0,35)
         this.form.Manufacturer = this.userInfo.Manufacturer;
       }
     },
@@ -671,4 +865,24 @@ export default {
   display: flex;
   flex-direction: column;
 }
+.el-upload-list__item {
+      transition: none !important;
+    }
+    .imgContainer{
+      display: flex;
+      align-items: center;
+      padding: 40px;
+    }
+    .imgWrap{
+      width: 200px;
+      height: 200px;
+      margin-bottom: 15px;
+      margin-right: 15px;
+    }
+    .imgWrap img{
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+   
 </style>
