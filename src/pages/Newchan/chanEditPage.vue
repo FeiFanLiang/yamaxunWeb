@@ -582,17 +582,14 @@ export default {
   },
   methods: {
     handleUpload(response,file,fileList){
-      debugger
+      
       if(response.code == 1){
         this.$message.success('图片上传成功')
         this.newImg = fileList
       }
       
     },
-    uploadImg(params){
-      params
-      debugger
-    },
+    
     handlePictureCardPreview(file) {
         this.dialogImageUrl = file.url;
         this.imgDialog = true;
