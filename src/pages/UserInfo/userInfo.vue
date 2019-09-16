@@ -30,6 +30,8 @@
             </Cell>
             <Cell title="厂家名称" :label="userInfo.Manufacturer">
             </Cell>
+            <Cell title="EAN前缀" :label="userInfo.eanPre">
+            </Cell>
             <!-- <Cell title="商品数量" label="20" /> -->
             <Cell title="注册时间" :label="userInfo.formatCreatTime" />
             <Cell title="密码管理">
@@ -62,6 +64,11 @@
             <Input type="text" v-model="form.Manufacturer" placeholder="请输入新的厂家"></Input>
           </Form-Item>
         </Row>
+         <Row>
+          <Form-Item label="EAN前缀" prop="eanPre">
+            <Input type="text" v-model="form.eanPre" placeholder="请输入新的3位数EAN前缀"></Input>
+          </Form-Item>
+        </Row>
         </template>
         
        
@@ -83,6 +90,7 @@
           oldPass: "",
           newPass: "",
           newBrand: "",
+          eanPre:'',
           isPass: false,
           Manufacturer:''
         },
@@ -134,6 +142,18 @@
             {
               type:'string',
               min:1
+            }
+          ],
+          eanPre:[
+            {
+              required:true,
+              message:'请输入ean前缀',
+              trigger:'blur'
+            },
+            {
+              type:'string',
+              min:3,
+              max:3
             }
           ]
         }

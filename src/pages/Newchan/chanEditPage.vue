@@ -642,7 +642,7 @@ export default {
       ];
       let promiseArr = [];
       for (let key in this.form) {
-        if (arr.indexOf(key) !== -1) {
+        if (arr.indexOf(key) !== -1 && key.indexOf('trans') == -1) {
           let promise = new Promise((reslove, reject) => {
             const params = {
               country: this.form.country,

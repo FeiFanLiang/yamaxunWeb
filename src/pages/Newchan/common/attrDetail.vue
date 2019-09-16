@@ -48,11 +48,13 @@
 		
 				<el-table :data="formData" border stripe size="mini">
 					<template v-for="(value,key) in formData[0]">
-						<el-table-column :label="translateColumnLabel(key)" :key="key" align="center">
+            <template v-if="key !== 'ean' && key !== 'sku' && key.indexOf('trans') == -1">
+              	<el-table-column :label="translateColumnLabel(key)" :key="key" align="center">
 							<template slot-scope="scope">
 								<el-input size="mini" :disabled="editAble(key)" v-model="scope.row[key]" clearable @change="emitForm"></el-input>
 							</template>
 						</el-table-column>
+            </template>
 					</template>
 					<el-table-column label="操作">
 						<template slot-scope="scope">
@@ -146,7 +148,14 @@ export default {
 				'sku': "",
         'price': "",
         'quantity': "",
-        'imgurl':''
+        'imgurl1':'',
+        'imgurl2':'',
+        'imgurl3':'',
+        'imgurl4':'',
+        'imgurl5':'',
+        'imgurl6':'',
+        'imgurl7':'',
+        'imgurl8':''
 			}
 			
 			const picked = [...this.allInputOption,...this.allSelectOption].filter(el => el.addValues.length)

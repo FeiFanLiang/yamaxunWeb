@@ -34,16 +34,100 @@
 		</el-row>
 		<template v-if="spiderData.length">
 				<el-table :data="spiderData" border stripe size="mini">
-					<el-table-column label="SKU">
-						<template slot-scope="scope">
-							<el-input v-model="scope.row.sku" disabled size="mini"></el-input>
-						</template>
-					</el-table-column>
-					<el-table-column label="EAN(EAN码)">
-						<template slot-scope="scope">
-							<el-input v-model="scope.row.ean" disabled size="mini"></el-input>
-						</template>
-					</el-table-column>
+				<el-table-column type="expand" label="图片信息">
+      <template slot-scope="props">
+			 <el-form size="mini" label-position="left" class="demo-table-expand">
+          <el-form-item label="图片1">
+            <el-input v-model="props.imgurl1"></el-input>
+			<el-tooltip class="item" effect="dark"  placement="top" v-if="props.imgurl1">
+               <div slot="content">
+                <div class="imgWrap">
+                <img :src="props.row.imgurl1" alt="">
+                </div>
+               </div>
+      <el-button>图片预览</el-button>
+    </el-tooltip>
+          </el-form-item>
+          <el-form-item label="图片2">
+            <el-input v-model="props.imgurl2"></el-input>
+			<el-tooltip class="item" effect="dark"  placement="top" v-if="props.imgurl2">
+               <div slot="content">
+                <div class="imgWrap">
+                <img :src="props.row.imgurl2" alt="">
+                </div>
+               </div>
+      <el-button>图片预览</el-button>
+    </el-tooltip>
+          </el-form-item>
+		  <el-form-item label="图片3">
+            <el-input v-model="props.imgurl3"></el-input>
+			<el-tooltip class="item" effect="dark"  placement="top" v-if="props.imgurl3">
+               <div slot="content">
+                <div class="imgWrap">
+                <img :src="props.row.imgurl3" alt="">
+                </div>
+               </div>
+      <el-button>图片预览</el-button>
+    </el-tooltip>
+          </el-form-item>
+		  <el-form-item label="图片4">
+            <el-input v-model="props.imgurl4"></el-input>
+			<el-tooltip class="item" effect="dark"  placement="top" v-if="props.imgurl4">
+               <div slot="content">
+                <div class="imgWrap">
+                <img :src="props.row.imgurl4" alt="">
+                </div>
+               </div>
+      <el-button>图片预览</el-button>
+    </el-tooltip>
+          </el-form-item>
+		  <el-form-item label="图片5">
+            <el-input v-model="props.imgurl5"></el-input>
+			<el-tooltip class="item" effect="dark"  placement="top" v-if="props.imgurl5">
+               <div slot="content">
+                <div class="imgWrap">
+                <img :src="props.row.imgurl5" alt="">
+                </div>
+               </div>
+      <el-button>图片预览</el-button>
+    </el-tooltip>
+          </el-form-item>
+		  <el-form-item label="图片6">
+            <el-input v-model="props.imgurl6"></el-input>
+			<el-tooltip class="item" effect="dark"  placement="top" v-if="props.imgurl6">
+               <div slot="content">
+                <div class="imgWrap">
+                <img :src="props.row.imgurl6" alt="">
+                </div>
+               </div>
+      <el-button>图片预览</el-button>
+    </el-tooltip>
+          </el-form-item>
+		  <el-form-item label="图片7">
+            <el-input v-model="props.imgurl7"></el-input>
+			<el-tooltip class="item" effect="dark"  placement="top" v-if="props.imgurl7">
+               <div slot="content">
+                <div class="imgWrap">
+                <img :src="props.row.imgurl7" alt="">
+                </div>
+               </div>
+      <el-button>图片预览</el-button>
+    </el-tooltip>
+          </el-form-item>
+		  <el-form-item label="图片8">
+            <el-input v-model="props.imgur8"></el-input>
+			<el-tooltip class="item" effect="dark"  placement="top" v-if="props.imgurl8">
+               <div slot="content">
+                <div class="imgWrap">
+                <img :src="props.row.imgurl8" alt="">
+                </div>
+               </div>
+      <el-button>图片预览</el-button>
+    </el-tooltip>
+          </el-form-item>
+        </el-form>
+      </template>
+    </el-table-column>
 					<el-table-column label="name(属性标题)">
 						<template slot-scope="scope">
 							<el-tag v-if="attrMap.name">{{attrMap.name}}</el-tag>
@@ -66,11 +150,8 @@
 							<el-input v-model="scope.row.quality" size="mini"></el-input>
 						</template>
 					</el-table-column>
-					<el-table-column label="imgurl(变种图片)">
-						<template slot-scope="scope">
-							<el-input v-model="scope.row.imgurl" size="mini"></el-input>
-						</template>
-					</el-table-column>
+					
+					
 					<el-table-column label="操作">
 						<template slot-scope="scope">
 							<el-button type="danger" @click="removeChild(scope.$index)" size="mini">移除</el-button>
