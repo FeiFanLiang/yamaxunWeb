@@ -32,11 +32,44 @@
       </template>
     </Row>
     <br />
-    <Table stripe :columns="columns1" :data="formList" @on-selection-change="bathSelect" :loading="loading">
-      <template slot-scope="{ row, index }" slot="action" v-if="selfList">
-        <Button type="primary" size="small" style="margin-right: 5px" @click="editColumns(row)">编辑</Button>
+    <el-table :data="formList" v-loading="loading"  @selection-change="bathSelect" size="mini">
+    <el-table-column
+      type="selection"
+      width="55">
+    </el-table-column>
+    <el-table-column type="expand">
+      <template slot-scope="props">
+        <el-table :data="props.row.spiderChild">
+          <el-table-column label="采集变种属性1" prop="name" align="center"></el-table-column>
+          <el-table-column label="采集变种属性2" prop="skuName" align="center"></el-table-column>
+          <el-table-column label="数量" prop="quality" align="center"></el-table-column>
+          <el-table-column label="价格" prop="price" align="center"></el-table-column>
+        </el-table>
+        </el-form>
       </template>
-    </Table>
+    </el-table-column>
+      <el-table-column label="站点" prop="country" align="center"></el-table-column>
+      <el-table-column label="商品名称" prop="merChanName" align="center"></el-table-column>
+      <el-table-column label="描述" show-overflow-tooltip prop="description" align="center"></el-table-column>
+      <el-table-column label="品牌" show-overflow-tooltip prop="brand" align="center"></el-table-column>
+      <el-table-column label="生产厂家" show-overflow-tooltip prop="Manufacturer" align="center"></el-table-column>
+      <el-table-column label="关键词" prop="keyword" align="center"></el-table-column>
+      <el-table-column label="子变种数量" align="center">
+        <template slot-scope="scope">
+          {{scope.row.childAttr.length}}
+        </template>
+      </el-table-column>
+      <el-table-column label="价格" prop="price" align="center"></el-table-column>
+      <el-table-column label="数量" prop="quantity" align="center"></el-table-column>
+      <el-table-column label="售卖时间" prop="soldDate" align="center"></el-table-column>
+      <el-table-column label="产品类型" prop="productType" align="center"></el-table-column>
+      <el-table-column label="创建时间" prop="creatTime" fixed="right" width="100" align="center"> </el-table-column>
+      <el-table-column label="操作"  fixed="right" width="100" align="center">
+        <template slot-scope="scope">
+          <el-button size="mini" type="primary" @click="editColumns(scope.row)">编辑</el-button>
+        </template>
+       </el-table-column>
+    </el-table>
     <br/>
     <Row type="flex" justify="center">
         <Page  :current="current" :page-size="30" :total="total" @on-change="getMerList" show-total />
@@ -189,8 +222,8 @@ export default {
                         }
                     },
         {
-            title:'ParentSku',
-            key:'parentSku'
+            title:'站点',
+            key:'country'
         },
         {
           title: "商品名称",
@@ -201,8 +234,10 @@ export default {
           key: "price"
         },
         {
-          title: "售卖日期",
-          key: "soldDate"
+          title:'描述',
+          slot:'des',
+          width:100,
+          align:"center"
         },
         {
             title:'创建时间',
@@ -625,7 +660,13 @@ export default {
                     children['relationship_type'] = 'Variation'
                     children['variation_theme'] = el.VariType
                     children['number_of_items'] = child.quantity
-                    children['main_image_url'] = child.imgurl
+                    children['main_image_url'] = child.imgurl1
+                    children['other_image_url1'] = child.imgurl2 || el.mainImgUrl2
+                    children['other_image_url1'] = child.imgurl3 || el.mainImgUrl3
+                    children['other_image_url1'] = child.imgurl4 || el.mainImgUrl4
+                    children['other_image_url1'] = child.imgurl5 || el.mainImgUrl5
+                    children['other_image_url1'] = child.imgurl6 || el.mainImgUrl6
+                    children['other_image_url1'] = child.imgurl7 || el.mainImgUrl7
                     current.push(children)
                 })
             }else{
