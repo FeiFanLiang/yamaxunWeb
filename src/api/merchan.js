@@ -2,46 +2,53 @@
 import axios from './request';
 
 export default {
-    async addMer(params){
+    async addMer(params) {
         return axios({
-            method:'post',
-            url:'/creatNewMer',
-            data:params
+            method: 'post',
+            url: '/creatNewMer',
+            data: params
         })
     },
-    async getMerList(params){
+    async getMerList(params) {
         return axios({
-            method:'post',
-            url:'/getMerList',
-            data:params
+            method: 'post',
+            url: '/getMerList',
+            data: params
         })
     },
-    async updateMer(params){
+    async updateMer(params) {
         return axios({
-            method:'post',
-            url:'/editMer',
-            data:params
+            method: 'post',
+            url: '/editMer',
+            data: params
         })
     },
-    async getMerListFromAuth(params){
+    async getMerListFromAuth(params) {
         return axios({
-            method:'post',
-            url:'/getMerListByAuth',
-            data:params
+            method: 'post',
+            url: '/getMerListByAuth',
+            data: params
         })
     },
-    async deleteMer(params){
+    async deleteMer(params) {
         return axios({
-            method:'get',
-            url:'/deleteMer',
+            method: 'get',
+            url: '/deleteMer',
             params
         })
     },
-    async excelLoad(params){
+    async excelLoad(params) {
         return axios({
-            method:'get',
-            url:'/excel',
+            method: 'get',
+            url: '/excel',
             params
+        })
+    },
+    async batchEdit(params) {
+        return axios({
+            method: 'post',
+            url: '/batchEdit',
+            data: params
         })
     }
 }

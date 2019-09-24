@@ -26,7 +26,9 @@
 				<div class="item">
 					<el-button type="success" @click="replaceTarget" size="mini">替换</el-button>
 				</div>
-			
+				<div class="item">
+					<el-button type="primary" @click="submitData" size="mini">保存</el-button>
+				</div>
 				
 			
 		
@@ -38,8 +40,8 @@
       <template slot-scope="props">
 			 <el-form size="mini" label-position="left" class="demo-table-expand">
           <el-form-item label="图片1">
-            <el-input v-model="props.imgurl1"></el-input>
-			<el-tooltip class="item" effect="dark"  placement="top" v-if="props.imgurl1">
+            <el-input v-model="props.row.imgurl1"></el-input>
+			<el-tooltip class="item" effect="dark"  placement="top" v-if="props.row.imgurl1">
                <div slot="content">
                 <div class="imgWrap">
                 <img :src="props.row.imgurl1" alt="">
@@ -49,8 +51,8 @@
     </el-tooltip>
           </el-form-item>
           <el-form-item label="图片2">
-            <el-input v-model="props.imgurl2"></el-input>
-			<el-tooltip class="item" effect="dark"  placement="top" v-if="props.imgurl2">
+            <el-input v-model="props.row.imgurl2"></el-input>
+			<el-tooltip class="item" effect="dark"  placement="top" v-if="props.row.imgurl2">
                <div slot="content">
                 <div class="imgWrap">
                 <img :src="props.row.imgurl2" alt="">
@@ -60,8 +62,8 @@
     </el-tooltip>
           </el-form-item>
 		  <el-form-item label="图片3">
-            <el-input v-model="props.imgurl3"></el-input>
-			<el-tooltip class="item" effect="dark"  placement="top" v-if="props.imgurl3">
+            <el-input v-model="props.row.imgurl3"></el-input>
+			<el-tooltip class="item" effect="dark"  placement="top" v-if="props.row.imgurl3">
                <div slot="content">
                 <div class="imgWrap">
                 <img :src="props.row.imgurl3" alt="">
@@ -71,8 +73,8 @@
     </el-tooltip>
           </el-form-item>
 		  <el-form-item label="图片4">
-            <el-input v-model="props.imgurl4"></el-input>
-			<el-tooltip class="item" effect="dark"  placement="top" v-if="props.imgurl4">
+            <el-input v-model="props.row.imgurl4"></el-input>
+			<el-tooltip class="item" effect="dark"  placement="top" v-if="props.row.imgurl4">
                <div slot="content">
                 <div class="imgWrap">
                 <img :src="props.row.imgurl4" alt="">
@@ -82,8 +84,8 @@
     </el-tooltip>
           </el-form-item>
 		  <el-form-item label="图片5">
-            <el-input v-model="props.imgurl5"></el-input>
-			<el-tooltip class="item" effect="dark"  placement="top" v-if="props.imgurl5">
+            <el-input v-model="props.row.imgurl5"></el-input>
+			<el-tooltip class="item" effect="dark"  placement="top" v-if="props.row.imgurl5">
                <div slot="content">
                 <div class="imgWrap">
                 <img :src="props.row.imgurl5" alt="">
@@ -93,8 +95,8 @@
     </el-tooltip>
           </el-form-item>
 		  <el-form-item label="图片6">
-            <el-input v-model="props.imgurl6"></el-input>
-			<el-tooltip class="item" effect="dark"  placement="top" v-if="props.imgurl6">
+            <el-input v-model="props.row.imgurl6"></el-input>
+			<el-tooltip class="item" effect="dark"  placement="top" v-if="props.row.imgurl6">
                <div slot="content">
                 <div class="imgWrap">
                 <img :src="props.row.imgurl6" alt="">
@@ -104,8 +106,8 @@
     </el-tooltip>
           </el-form-item>
 		  <el-form-item label="图片7">
-            <el-input v-model="props.imgurl7"></el-input>
-			<el-tooltip class="item" effect="dark"  placement="top" v-if="props.imgurl7">
+            <el-input v-model="props.row.imgurl7"></el-input>
+			<el-tooltip class="item" effect="dark"  placement="top" v-if="props.row.imgurl7">
                <div slot="content">
                 <div class="imgWrap">
                 <img :src="props.row.imgurl7" alt="">
@@ -115,8 +117,8 @@
     </el-tooltip>
           </el-form-item>
 		  <el-form-item label="图片8">
-            <el-input v-model="props.imgur8"></el-input>
-			<el-tooltip class="item" effect="dark"  placement="top" v-if="props.imgurl8">
+            <el-input v-model="props.row.imgur8"></el-input>
+			<el-tooltip class="item" effect="dark"  placement="top" v-if="props.row.imgurl8">
                <div slot="content">
                 <div class="imgWrap">
                 <img :src="props.row.imgurl8" alt="">
@@ -158,9 +160,7 @@
 						</template>
 					</el-table-column>
 				</el-table>
-				<el-row>
-					<el-button type="primary" @click="submitData" size="mini">保存</el-button>
-				</el-row>
+				
 		</template>
 	</section>
 </template>
@@ -211,16 +211,22 @@ export default {
 		},
 		submitData(){
 			const newChild = this.spiderData.map(el => {
+				// let obj = {
+					
+				// 	[this.attrMap.skuName]:el.skuName,
+				// 	[this.attrMap.name]:el.name,
+				// 	ean:el.ean,
+				// 	price:el.price,
+				// 	quality:el.quality,
+				// 	imgurl:el.imgurl,
+				// 	sku:el.sku
+				// }
 				let obj = {
 					[this.attrMap.skuName]:el.skuName,
 					[this.attrMap.name]:el.name,
-					ean:el.ean,
-					price:el.price,
-					quality:el.quality,
-					imgurl:el.imgurl,
-					sku:el.sku
 				}
-				return obj
+
+				return Object.assign({},el,obj)
 			})
 			
 			this.$emit('editCallback',newChild)

@@ -65,7 +65,7 @@
                 <img :src="scope.row.imgurl" alt="">
                 </div>
                </div>
-      <el-button>图片预览</el-button>
+      
     </el-tooltip>
 						</template>
 					</el-table-column>

@@ -6,10 +6,10 @@
           <el-form-item label="品牌信息" prop="brand" style="width:300px">
             <el-input v-model="form.brand" disabled></el-input>
           </el-form-item>
-          <el-form-item label="站点" prop="country">
+          <el-form-item label="站点">
             <countrySelect v-model="form.country"></countrySelect>
           </el-form-item>
-          <el-form-item label="目录分类" prop="categoryType">
+          <el-form-item label="目录分类">
             <categoryTypeNode
               ref="category"
               v-model="form.categorySelectPath"
@@ -56,7 +56,7 @@
           <el-form-item label="产品数量" prop="quantity">
             <el-input style="width:800px" v-model.number="form.quantity"></el-input>
           </el-form-item>
-          <el-form-item label="产品价格" prop="price">
+          <el-form-item label="产品价格" prop="price" v-if="form.hasVarieta">
             <el-input v-model="form.price" style="width:800px" placeholder="商品价格,保留两位小数"></el-input>
           </el-form-item>
           <el-form-item label="关键词" prop="keyword">
@@ -393,6 +393,8 @@ export default {
         //选择的分类类型
         categoryTypeText: "",
 				parentCategoryTypeId:'',
+        //全路径中文
+        categorySelectPathText:'',
         //是否有变种
         hasVarieta: 0,
         //当前选择的变种
@@ -621,72 +623,7 @@ export default {
     handleVariType(val){
       this.form.VariType = val
     },
-    async translateForm() {
-      let arr = [
-        "merChanName",
-        "description",
-        "point1",
-        "point2",
-        "point3",
-        "point4",
-        "point5"  
-      ];
-      let childArr = [
-        "sku",
-        "price",
-        "quantity",
-        "imgurl",
-        "ean",
-        "size_map",
-        "size_name"
-      ];
-      let promiseArr = [];
-      for (let key in this.form) {
-        if (arr.indexOf(key) !== -1 && key.indexOf('trans') == -1) {
-          let promise = new Promise((reslove, reject) => {
-            const params = {
-              country: this.form.country,
-              query: this.form[key]
-            };
-            translateApi
-              .translate(params)
-              .then(res => {
-                this.form[key + "trans"] = res.data;
-                reslove();
-              })
-              .catch(() => {
-                reject();
-              });
-          });
-          promiseArr.push(promise);
-        }
-      }
-      if (this.form.childAttr.length) {
-        for (let child of this.form.childAttr) {
-          for (let key in child) {
-            if (childArr.indexOf(key) == -1) {
-              let promise = new Promise((reslove, reject) => {
-                const params = {
-                  country: this.form.country,
-                  query: child[key]
-                };
-                translateApi
-                  .translate(params)
-                  .then(res => {
-                    child[key + "trans"] = res.data;
-                    reslove();
-                  })
-                  .catch(() => {
-                    reject();
-                  });
-              });
-              promiseArr.push(promise);
-            }
-          }
-        }
-      }
-      await Promise.all(promiseArr);
-    },
+    
     handleChidChange(val) {
       this.form.childAttr = val;
     },
@@ -696,13 +633,13 @@ export default {
         if (valid) {
           const loading = this.$loading({
             lock: true,
-            text: "翻译上传中",
+            text: "上传中",
             spinner: "el-icon-loading",
             background: "rgba(0, 0, 0, 0.7)"
           });
           if (this.$route.query.edit) {
            
-              await this.translateForm();
+              
             
             merchan
               .updateMer(this.form)
@@ -720,7 +657,7 @@ export default {
                 loading.close();
               });
           } else {
-            await this.translateForm();
+            
             merchan
               .addMer(this.form)
               .then(res => {
@@ -771,6 +708,7 @@ export default {
       this.splitCategoryTypeAttrOptions = [];
       const checkType = val;
       this.form.categoryType = checkType.categoryId;
+      this.form.categorySelectPathText = checkType.nodePath
 			this.form.parentCategoryTypeId = checkType.nodePathId.split('/')[0]
       if (checkType.categoryType.indexOf(",") !== -1) {
         //分类存在多个属性的情况,需要再次选择

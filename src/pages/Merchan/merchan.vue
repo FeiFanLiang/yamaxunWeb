@@ -49,6 +49,7 @@
       </template>
     </el-table-column>
       <el-table-column label="站点" prop="country" align="center"></el-table-column>
+      <el-table-column label="分类路径" prop="categorySelectPathText" align="center" show-overflow-tooltip></el-table-column>
       <el-table-column label="商品名称" prop="merChanName" align="center"></el-table-column>
       <el-table-column label="描述" show-overflow-tooltip prop="description" align="center"></el-table-column>
       <el-table-column label="品牌" show-overflow-tooltip prop="brand" align="center"></el-table-column>
@@ -72,60 +73,68 @@
     </el-table>
     <br/>
     <Row type="flex" justify="center">
-        <Page  :current="current" :page-size="30" :total="total" @on-change="getMerList" show-total />
+        <Page  :current="current" :page-size="30" :total="total" @on-change="fetchData" show-total />
     </Row>
     <el-dialog title="批量编辑分类信息" :visible.sync="dialogFormVisible">
-      <el-form size="mini">
-        <el-form-item label="站点">
-          <countrySelect v-model="categoryAttr.country" size="mini"></countrySelect>
-        </el-form-item>
-        <el-form-item label="目录">
-          <categoryTypeNode v-model="categoryAttr.categorySelectPath"
-              @picked="handlePicked"
-              :site="categoryAttr.country"></categoryTypeNode>
-        </el-form-item>
-      <!--  <el-form-item label="分类类型" v-if="splitCategoryTypeAttrOptions.length">
-          <el-select placeholder="请选择分类类型" v-model="categoryAttr.categoryTypeText">
-              <el-option
-                v-for="(item,index) of splitCategoryTypeAttrOptions"
-                :key="index"
-                :value="item"
-                :label="item"
-              ></el-option>
-            </el-select>
-        </el-form-item>
-        <el-form-item label="产品类型">
-           <el-select v-model="categoryAttr.productType" placeholder="请选择产品分类" v-loading="productTypeLoading">
-              <el-option
-                v-for="(item,index) of currentCategoryAttr.product_type"
-                :key="index"
-                :label="item"
-                :value="item"
-              ></el-option>
-            </el-select>
-        </el-form-item>
-        <el-form-item label="变种属性" v-if="currentCategoryAttr.skuAttTheme">
-          <el-select  v-model="selectAttr" @change="handleChange" placeholder="请选择变种属性" size="mini">
-        <el-option
-          v-for="(value,index) in currentCategoryAttr.skuAttTheme.values"
-          :key="index"
-          :value="value"
-          :label="value"
-        ></el-option>
-      </el-select>
-        </el-form-item> -->
-                <el-form-item label="操作">
-          <el-button type="primary" @click="addBatchData">添加</el-button>
-        </el-form-item>
-      </el-form>
-      <el-row>
-        <el-tag v-for="(item,index) of batchCategorySave" :key="index" closable
-  :disable-transitions="false"
-  @close="handleClose(index)">{{item.country}}</el-tag>
-      </el-row>
+       <batchEdit :site="'de'" @done="handleDone"></batchEdit>
+       <br/>
+       <batchEdit :site="'fr'" @done="handleDone"></batchEdit>
+       <br/>
+       <batchEdit :site="'it'" @done="handleDone"></batchEdit>
+       <br/>
+       <batchEdit :site="'uk'" @done="handleDone"></batchEdit>
+       <br/>
+       <batchEdit :site="'es'" @done="handleDone"></batchEdit>
+       <br/>
+       <el-row>
+        <el-input v-model="textDe.description" type="textarea" :autosize="{ minRows: 2}"
+              maxlength="2000"
+              show-word-limit
+              placeholder="请输入关键词,不能超过2000字符"></el-input>  
+       </el-row>
+       <br>
+       <el-row>
+        <el-input v-model="textDe.point1" type="textarea" :autosize="{ minRows: 2}"
+              maxlength="500"
+              show-word-limit
+              placeholder="请输入重点描述1,不能超过500字符"></el-input>  
+       </el-row>
+             
+       
+              <br/>
+              <el-row>
+              <el-input v-model="textDe.point2" type="textarea" :autosize="{ minRows: 2}"
+              maxlength="500"
+              show-word-limit
+              placeholder="请输入重点描述2,不能超过500字符"></el-input>         
+              </el-row>
+       
+              <br/>
+              <el-row>
+                 <el-input v-model="textDe.point3" type="textarea" :autosize="{ minRows: 2}"
+              maxlength="500"
+              show-word-limit
+              placeholder="请输入重点描述3,不能超过500字符"></el-input>          
+              </el-row>
+              <br/>
+              <el-row>
+                   <el-input v-model="textDe.point4" type="textarea" :autosize="{ minRows: 2}"
+              maxlength="500"
+              show-word-limit
+              placeholder="请输入重点描述4,不能超过500字符"></el-input>
+              </el-row>
+      
+              <br/>
+              <el-row>
+        <el-input v-model="textDe.point5" type="textarea" :autosize="{ minRows: 2}"
+              maxlength="500"
+              show-word-limit
+              placeholder="请输入重点描述5,不能超过500字符"></el-input>         
+              </el-row>
+       
   <div slot="footer" class="dialog-footer">
     <el-button @click="dialogFormVisible = false">取 消</el-button>
-    <el-button type="primary" @click="bathCategoryType">确 定</el-button>
+    <el-button type="primary" @click="batchSave"></el-button>
   </div>
 </el-dialog>
     <Modal
@@ -160,14 +169,12 @@ import xlsx from 'xlsx';
 import xlsxStyle from 'xlsx-style';
 import {regions,attrData} from '@/common/options.js';
 import childChan from './childChanList.vue';
-import countrySelect from '@/pages/Newchan/common/countrySelect'
-import categoryTypeNode from '@/pages/Newchan/common/categoryTypeNode'
+import batchEdit from '@/pages/Newchan/common/batchEdit';
 import {mapState} from 'vuex';
 export default {
   components:{
       childChan,
-      countrySelect,
-      categoryTypeNode
+      batchEdit
   },
   data() {
     return {
@@ -177,7 +184,7 @@ export default {
       modalLoading:false,
       selectLoading:false,
       attrData:attrData,
-      selectAttr:'',
+     
         selectArr:[],
         current:1,
         total:0,
@@ -190,16 +197,8 @@ export default {
            creatTime:'',
            excelName:''
         },
-        categoryAttr:{
-          country:"",
-          categorySelectPath:[],
-          categoryType:'',
-          // categoryTypeText:"",
-           parentCategoryTypeId:'',
-          // productType:'',
-          // VariType:""
-        },
-        batchCategorySave:[],
+     
+        
         exportQuery:{
           id:'',
           dateRange:[]
@@ -276,9 +275,22 @@ export default {
         ]
       },
      formList:[],
-     
-     splitCategoryTypeAttrOptions:[],
-     currentCategoryAttr:{}
+     textDe:{
+       description:'',
+       point1:'',
+       point2:'',
+       point3:'',
+       point4:'',
+       point5:''
+     },
+     batchDeatil:{
+       es:{},
+       uk:{},
+       de:{},
+       fr:{},
+       it:{}
+     }
+    
     };
   },
   mounted() {
@@ -289,247 +301,139 @@ export default {
     ...mapState(["userInfo"])
   },
   watch:{
-    async "categoryAttr.categoryTypeText"(val) {
-      if (!val) {
-        return;
-      }
-      const params = {
-        site: this.categoryAttr.country,
-        categoryType: val
-      };
-      this.productTypeLoading = true
-      await this.fetchAttrData(params);
-      this.initAttrOptions();
-      this.productTypeLoading = false
-    }
+    
   },
   methods: {
-    addBatchData(){
-      this.batchCategorySave.push(Object.assign({},this.categoryAttr))
-    },
-    handleClose(index){
-      this.batchCategorySave.splice(index,1)
-    },
-    //翻译
-    async translateForm(data) {
-      let arr = [
-        "merChanName",
-        "description",
-        "point1",
-        "point2",
-        "point3",
-        "point4",
-        "point5"
-      ];
-      let childArr = [
-        "sku",
-        "price",
-        "quantity",
-        "imgurl",
-        "ean",
-        "size_map",
-        "size_name"
-      ];
-      let promiseArr = [];
-      for (let key in data) {
-        if (arr.indexOf(key) !== -1 && key.indexOf('trans') == -1) {
-          let promise = new Promise((reslove, reject) => {
-            const params = {
-              country: data.country,
-              query: data[key]
-            };
-            translateApi
-              .translate(params)
-              .then(res => {
-                data[key + "trans"] = res.data;
-                reslove();
-              })
-              .catch(() => {
-                reject();
-              });
-          });
-          promiseArr.push(promise);
+   async batchSave(){
+     const loading = this.$loading({
+          lock: true,
+          text: '翻译生成中..请稍后',
+          spinner: 'el-icon-loading',
+          background: 'rgba(0, 0, 0, 0.7)'
+        });
+     let batchData = []
+     if(!this.selectArr.length){
+       this.$Message.error('未选中数据!')
+       this.dialogFormVisible = false
+       return
+     }
+     for(let country in this.batchDeatil){
+       if(Object.keys(this.batchDeatil[country]).length === 0) continue
+        for(let form of this.selectArr){
+          batchData.push(this.creatNewForm(form,this.batchDeatil[country]))
+        }
+     }
+    batchData.forEach(el => {
+      for(let k in this.textDe){
+        if(this.textDe[k]){
+          el[k] = this.textDe[k]
         }
       }
-      if (data.childAttr.length) {
-        for (let child of data.childAttr) {
-          for (let key in child) {
-            if (childArr.indexOf(key) == -1) {
-              let promise = new Promise((reslove, reject) => {
-                const params = {
-                  country: data.country,
-                  query: child[key]
-                };
-                translateApi
-                  .translate(params)
-                  .then(res => {
-                    child[key + "trans"] = res.data;
-                    reslove();
-                  })
-                  .catch(() => {
-                    reject();
-                  });
-              });
-              promiseArr.push(promise);
-            }
-          }
-        }
-      }
-      await Promise.all(promiseArr);
-      return data
-    },
-    handleChange(val){
-      const atrr = this.currentCategoryAttr.skuAttTheme.attributeName
-      this.categoryAttr.VariType = atrr
-    },
-    async handlePicked(val) {
-      this.$set(this.categoryAttr, "categoryTypeText", "");
-      
-      // this.$set(this.categoryAttr, "productType", "");
-      // this.$set(this.categoryAttr,'VariType','')
-      // this.selectAttr = ''
-      // this.splitCategoryTypeAttrOptions = [];
-       const checkType = val;
-      this.categoryAttr.categoryType = checkType.categoryId;
-			this.categoryAttr.parentCategoryTypeId = checkType.nodePathId.split('/')[0]
-      return
-      if (checkType.categoryType.indexOf(",") !== -1) {
-        //分类存在多个属性的情况,需要再次选择
-        this.splitCategoryTypeAttrOptions = checkType.categoryType.split(",");
-        return;
-      }
-      this.$set(this.categoryAttr, "categoryTypeText", checkType.categoryType);
-      const params = {
-        site: val.site,
-        categoryType: val.categoryType
-      };
-      this.productTypeLoading = true
-      await this.fetchAttrData(params);
-      this.initAttrOptions();
-      this.productTypeLoading = false
-    },
-    async fetchAttrData(params) {
-      const res = await categoryApi.getCategoryList(params);
-      this.originAttrData = res.data;
-    },
-    initAttrOptions() {
-      let skuAttTheme = "";
-      let skuAttThemeArr = [];
-      let skuAttThemeReal = {};
-      let skuEndemicAttr = [];
-      let product_type = [];
-      this.currentCategoryAttr = {};
-      this.originAttrData.forEach(el => {
-        if (el.attributeId == "variation_theme") skuAttTheme = el;
-        if (el.attributeId == "feed_product_type") {
-          product_type = JSON.parse(el.values);
-        }
-        if (attrData.skuNotDisplay.indexOf(el.attributeId) === -1) {
-          if (el.variantionSpecifics === 1) {
-            skuEndemicAttr.push(el);
-          }
-          skuAttThemeArr.push(el);
-        }
-      });
-      if (skuAttTheme) {
-        let theme = skuAttTheme.values;
-        if (theme) {
-          const themeValus = JSON.parse(theme);
-          let skArr = [];
-          skuAttThemeArr.forEach(sku => {
-            themeValus.forEach(theme => {
-              if (theme.indexOf("/") !== -1 || theme.indexOf("-") !== -1) {
-                if (theme.indexOf("/") !== -1) skArr = theme.split("/");
-                if (theme.indexOf("-") !== -1) skArr = theme.split("-");
-              } else {
-                skArr.push(theme);
-              }
-              if (skArr.length > 0) {
-                skArr.forEach(el => {
-                  let names = el
-                    ? attrData.skuAttrRelation[el.toLowerCase()]
-                    : "";
-                  if (names) {
-                    names.forEach(name => {
-                      if (sku.attributeId === name && !skuAttThemeReal[name]) {
-                        skuAttThemeReal[name] = sku;
-                      }
-                    });
-                  }
-                });
-              }
-            });
-          });
-        }
-      }
-      if (skuAttTheme) {
-        skuAttTheme.values = JSON.parse(skuAttTheme.values);
-        this.currentCategoryAttr.skuAttTheme = skuAttTheme;
-      //  this.radioShow = true;
-      } else {
-      //  this.radioShow = false;
-      }
-      
-      this.currentCategoryAttr.skuEndemicAttr = skuEndemicAttr;
-      this.currentCategoryAttr.skuThemeAttr = skuAttThemeReal;
-      this.currentCategoryAttr.product_type = product_type;
-    },
-    async bathCategoryType(){
-      const loading = this.$loading({
-            lock: true,
-            text: "翻译上传中",
-            spinner: "el-icon-loading",
-            background: "rgba(0, 0, 0, 0.7)"
-          });
+    })
+     let promiseArr = batchData.map(el => {
+       return new Promise((reslove,reject) => {
+         this.translateForm(el).then((data) => {reslove(data)}).catch(() => {reject()})
+       })
+
+     })
+     let newList = await Promise.all(promiseArr)
      
-      if(this.selectArr.length == 0){
-        this.$Message.error('请先选择')
-        return
-      }
-   if(this.selectArr.find(el => !el.country)){
-     this.$Message.error('请先进行编辑再批量修改')
-     return
-   }
-    let merList = []
-    for(let mer of this.selectArr){
-      for(let categorySave of this.batchCategorySave){
-        if(!mer || !categorySave) return
-        let newMer = Object.assign({},mer,categorySave)
-        delete newMer._id
-        delete newMer.uuid
-        newMer.parentSku = (newMer.brand + "-" + this.$uuid()).slice(0,40)
-        newMer.Manufacturer = this.userInfo.Manufacturer;
-        if(newMer.childAttr.length){
-          newMer.childAttr.forEach((el,index) => {
-            let currentindex = index < 9 ? "0" + (index + 1) : index + 1;
-        el.sku = `${newMer.parentSku}-${currentindex}`;
-          })
-        }
-        merList.push(newMer)
-      }
-    }
+     await merchan.batchEdit(newList)
+     
+     this.dialogFormVisible = false
+     loading.close()
+    this.fetchData()
+   },
+   creatNewForm(form,newData){
+     let newForm = Object.assign({},form,newData)
+     newForm.parentSku = (form.brand + "-" + this.$uuid()).slice(0,32)
+     if(newForm.childAttr){
+       newForm.childAttr.forEach((el,index) => {
+         let currentindex = index < 9 ? "0" + (index + 1) : index + 1;
+        el.sku = `${newForm.parentSku}-${currentindex}`;
+       })
+     }
+     return newForm
+   },
+   handleDone(val){
+     this.batchDeatil[val.country] = val
+   },
+   formatTransData(data){
+     let transArr = ['merChanName','description','point1','point2','point3','point4','point5']
+     let noTransArr = ['sku','price','quality','imgurl','ean','size_map','model','size_name']
+     let str = ''
+     
+
+     for(let key of transArr){
+       
+       str+=`${key.toUpperCase()}=${data[key].replace(/[\ |\~|\`|\!|\@|\#|\$|\%|\^|\&|\*|\(|\)|\-|\_|\+|\=|\||\\|\[|\]|\{|\}|\;|\:|\"|\'|\,|\<|\.|\>|\/|\?]/g,',')}"\n"`
+     }
+     if(data.childAttr.length > 0){
+       for(let i=0,l=data.childAttr.length;i<l;i++){
+         let child = data.childAttr[i]
+         for(let k in child){
+           
+           if(noTransArr.indexOf(k) === -1 && k.indexOf('trans') == -1 && k.indexOf('imgurl') === -1){
+             str+=`${k.toUpperCase()+i}=${child[k]}"\n"`
+           }
+         }
+       }
+     }
+     str = str.slice(0,str.length - 1)
+     return str
+   },
+   async translateForm(data){
+     //description
+     let transArr = ['merChanName','description','point1','point2','point3','point4','point5']
+     
+     const str = this.formatTransData(data)
+     
+      const params = {
+                  country: data.country,
+                  query: str
+                };
+              let res =  await translateApi.translate(params)
+              
+                if(!res.data) return 
+                for(let i=0,l=res.data.length;i<l;i++){
+                  
+                  
+                  const trans = res.data[i]
+
+                  if(!trans.dst.replace(/"/g,'') || !trans.src.replace(/"/g,'')){
+                    continue
+                  }
+                  
+                  const transKey = trans.src.split('=')[0].replace(/\W/g,'')
+                  const transData = trans.dst.split('=')[1].replace(/"/g,'')
+                  
+                  for(let k in data){
+                    if(k.toUpperCase() == transKey){
+                      
+                      data[k+'trans'] = transData
+                    }
+                  }
+                  if(data.childAttr.length){
+                    data.childAttr.forEach((el,index) => {
+                      for(let k in el){
+                        if((k.toUpperCase()+index) == transKey){
+                          el[k+'trans'] = transData
+                        }
+                      }
+                    })
+                  }
+                  
+                }
+               
+               
+                  return data
+   },
     
-    let promiseArr = []
-    for(let mer of merList){
-        let promise = new Promise((reslove,reject) => {
-           this.translateForm(mer).then((data) => {
-             merchan
-              .addMer(data).then((res) => {
-                reslove()
-              }).catch(() => {
-                reject()
-              })
-           }).catch(() => {
-             reject()
-           })
-        })
-        promiseArr.push(promise)
-      
-    }
-    await Promise.all(promiseArr)
-    loading.close()
-    this.getMerList()
-    },
+    
+   
+   
+   
+    
       pickDate(val){
         this.exportQuery.dateRange = val
       },
@@ -619,7 +523,6 @@ export default {
                 'brand_name':el.brand,
                 'item_name':el['merChanNametrans'],
                 'recommended_browse_nodes':el.categoryType,
-                'standard_price':el.price,
                 'product_description':el['descriptiontrans'],
                 'model':el.model,
                 'bullet_point1':el['point1trans'],
@@ -660,13 +563,14 @@ export default {
                     children['relationship_type'] = 'Variation'
                     children['variation_theme'] = el.VariType
                     children['number_of_items'] = child.quantity
-                    children['main_image_url'] = child.imgurl1
+                    children['main_image_url'] = child.imgurl1 || el.mainImgUrl1
                     children['other_image_url1'] = child.imgurl2 || el.mainImgUrl2
                     children['other_image_url1'] = child.imgurl3 || el.mainImgUrl3
                     children['other_image_url1'] = child.imgurl4 || el.mainImgUrl4
                     children['other_image_url1'] = child.imgurl5 || el.mainImgUrl5
                     children['other_image_url1'] = child.imgurl6 || el.mainImgUrl6
                     children['other_image_url1'] = child.imgurl7 || el.mainImgUrl7
+                    children['standard_price'] = child.price
                     current.push(children)
                 })
             }else{
@@ -779,7 +683,7 @@ creatExcelLoad(data,template,saveName){
           })
          
           await Promise.all(promiseArr)
-          this.getMerList()         
+          this.fetchData()         
       },
       bathSelect(val){
           this.selectArr = val

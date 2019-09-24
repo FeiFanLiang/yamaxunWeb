@@ -60,6 +60,7 @@
   methods: {
    handleChange(val) {
     let current = this.$refs["case"].getCheckedNodes();
+    
     this.$emit("picked", current[0].data);
    },
 

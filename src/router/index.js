@@ -49,19 +49,27 @@ export default new Router({
             redirect: '/merchan/myCommit',
             component: Layout,
             children: [{
-                name: '我的商品',
-                path: 'myCommit',
-                meta:{},
-                component: () =>
-                    import ('@/pages/Merchan/merchan')
-            }, 
-        {
-            name:'商品编辑',
-            path:'editCommit',
-            meta:{},
-            component: () => import('@/pages/Newchan/chanEditPage')
-        }
-]
+                    name: '我的商品',
+                    path: 'myCommit',
+                    meta: {},
+                    component: () =>
+                        import ('@/pages/Merchan/merchan')
+                },
+                {
+                    name: '商品编辑',
+                    path: 'editCommit',
+                    meta: {},
+                    component: () =>
+                        import ('@/pages/Newchan/chanEditPage')
+                },
+                {
+                    name: 'test',
+                    path: 'test',
+                    meta: {},
+                    component: () =>
+                        import ('@/pages/Newchan/common/batchEdit')
+                }
+            ]
         },
         {
             name: '登录页面',
@@ -90,4 +98,3 @@ export default new Router({
 
     ]
 })
-
