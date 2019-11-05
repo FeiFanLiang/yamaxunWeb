@@ -8,7 +8,6 @@ import VueCookies from 'vue-cookies';
 import './style/index.less';
 //import 'iview/dist/styles/iview.css';
 import store from './store'
-import Cookies from 'js-cookie'
 import uuid from 'uuid/v4'
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';

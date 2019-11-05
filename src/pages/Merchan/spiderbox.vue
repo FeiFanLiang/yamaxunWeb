@@ -7,7 +7,7 @@
         <Input size="small" type="text" v-model="query.merChanName" placeholder="按商品名称搜索"></Input>
       </Col>
       <Col :span="2">
-      <el-date-picker
+        <el-date-picker
       size="mini"
       v-model="query.formatCreatTime"
       type="date"
@@ -15,37 +15,33 @@
       format="yyyy 年 MM 月 dd 日"
       value-format="yyyy-MM-dd">
     </el-date-picker>
-        
       </Col>
-     <Col :span="2">
-     <el-select v-model="query.country" placeholder="请选择国家" size="mini">
-       <el-option :value="'uk'" :label="'英国'"></el-option>
-       <el-option :value="'de'" :label="'德国'"></el-option>
-       <el-option :value="'fr'" :label="'法国'"></el-option>
-       <el-option :value="'it'" :label="'意大利'"></el-option>
-       <el-option :value="'es'" :label="'西班牙'"></el-option>
-     </el-select>
-      
-     </Col>
-     <Col :span="2">
-      <el-input placeholder="请输入导出次数" size="mini" v-model.number="query.exportTime"></el-input>
-     </Col>
+      <Col :span="2">
+        <Select v-model="query.country" size="small">
+          <Option :value="'uk'" :label="'英国'"></Option>
+            <Option :value="'de'" :label="'德国'"></Option>
+              <Option :value="'fr'" :label="'法国'"></Option>
+                <Option :value="'it'" :label="'意大利'"></Option>
+                  <Option :value="'es'" :label="'西班牙'"></Option>
+                
+              
+            
+          
+        </Select>
+      </Col>
       <Col :span="1">
         <Button type="info" size="small" @click="fetchData">搜索</Button>
       </Col>
       
       
        <template>
-            <Col :span="1">
-        <Button type="success" size="small" @click="exportCsv">导出表格</Button>
-      </Col>
-           <Col :span="1" v-if="selfList">
-        <Button type="info" size="small" @click="addNew">发布商品</Button>
-      </Col>
-        <Col :span="1" v-if="selfList">
+        <Col :span="1">
         <Button type="error" size="small" @click="bathDel">批量删除</Button>
       </Col>
-   
+     <Col :span="1">
+        <Button type="error" size="small" @click="dialogFormVisible=true">批量编辑</Button>
+      </Col>
+      
       </template>
     </Row>
     <br />
@@ -54,26 +50,37 @@
       type="selection"
       width="55">
     </el-table-column>
-      <el-table-column label="站点" prop="country" align="center"></el-table-column>
-      <el-table-column label="路径" prop="categorySelectPathText" align="center" show-overflow-tooltip ></el-table-column>
-      <el-table-column label="名称" prop="merChanName" align="center" show-overflow-tooltip></el-table-column>
-     
+    <el-table-column type="expand">
+      <template slot-scope="props">
+        <el-table :data="props.row.spiderChild">
+          <el-table-column label="采集变种属性1" prop="name" align="center"></el-table-column>
+          <el-table-column label="采集变种属性2" prop="skuName" align="center"></el-table-column>
+          <el-table-column label="数量" prop="quality" align="center"></el-table-column>
+          <el-table-column label="价格" prop="price" align="center"></el-table-column>
+        </el-table>
+        </el-form>
+      </template>
+    </el-table-column>
+      <el-table-column label="商品名称" prop="merChanName" align="center"></el-table-column>
+      <el-table-column label="描述" show-overflow-tooltip prop="description" align="center"></el-table-column>
+      <el-table-column label="品牌" show-overflow-tooltip prop="brand" align="center"></el-table-column>
+      <el-table-column label="生产厂家" show-overflow-tooltip prop="Manufacturer" align="center"></el-table-column>
       <el-table-column label="子变种数量" align="center">
         <template slot-scope="scope">
           {{scope.row.childAttr.length}}
         </template>
       </el-table-column>
-     <el-table-column label="导出次数" sortable prop="exportTime" align="center"></el-table-column>
-      <el-table-column label="创建时间" sortable prop="creatTime"  align="center"></el-table-column>
-      <el-table-column label="操作"   align="center" v-if="selfList">
+      <el-table-column label="编辑次数" prop="edit" width="100" align="center"> </el-table-column>
+      <el-table-column label="创建时间" prop="creatTime" fixed="right" width="100" align="center"> </el-table-column>
+      <el-table-column label="操作"  fixed="right" width="100" align="center">
         <template slot-scope="scope">
-          <el-button size="mini" type="primary" @click="editColumns(scope.row)">详情</el-button>
+          <el-button size="mini" type="primary" @click="editColumns(scope.row)">编辑</el-button>
         </template>
        </el-table-column>
     </el-table>
     <br/>
     <Row type="flex" justify="center">
-      <el-pagination
+        <el-pagination
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
       :current-page="pageIndex"
@@ -82,21 +89,78 @@
       layout="total, sizes, prev, pager, next, jumper"
       :total="total">
     </el-pagination>
-        
     </Row>
-
-    <Modal
-        v-model="modalShow"
-        title="导出表格"
-        :loading="modalLoading"
-        @on-ok="submit">
-       <Form :model="exportQuery" :rules="ruleValidate" ref="exportForm">
-        <Form-Item label="生成表格名" prop="excelName"> 
-           <Input v-model="exportQuery.excelName" placeholder="下载表格名(必填)"></Input>
-        </Form-Item>
-        </Form>
-    </Modal>
+    <el-dialog title="批量编辑分类信息" :visible.sync="dialogFormVisible">
+     <!-- <el-divider content-position="left">德国</el-divider> -->
+       <batchEdit  @done="handleDone"></batchEdit>
+       <br/>
+       <!-- <el-divider content-position="left">法国</el-divider>
+       <batchEdit :site="'fr'" @done="handleDone"></batchEdit>
+       <br/>
+       <el-divider content-position="left">意大利</el-divider>
+       <batchEdit :site="'it'" @done="handleDone"></batchEdit>
+       <br/>
+       <el-divider content-position="left">英国</el-divider>
+       <batchEdit :site="'uk'" @done="handleDone"></batchEdit>
+       <br/>
+       <el-divider content-position="left">西班牙</el-divider>
+       <batchEdit :site="'es'" @done="handleDone"></batchEdit> -->
+       
+       <el-row>
+        <el-input v-model="textDe.description" type="textarea" :autosize="{ minRows: 2}"
+              maxlength="1500"
+              show-word-limit
+              placeholder="请输入产品描述,不能超过2000字符"></el-input>  
+       </el-row>
+       <br>
+       <el-row>
+        <el-input v-model="textDe.point1" type="textarea" :autosize="{ minRows: 2}"
+              maxlength="100"
+              show-word-limit
+              placeholder="请输入重点1,不能超过100字符"></el-input>  
+       </el-row>
+             
+       
+              <br/>
+              <el-row>
+              <el-input v-model="textDe.point2" type="textarea" :autosize="{ minRows: 2}"
+              maxlength="100"
+              show-word-limit
+              placeholder="请输入重点2,不能超过100字符"></el-input>         
+              </el-row>
+       
+              <br/>
+              <el-row>
+                 <el-input v-model="textDe.point3" type="textarea" :autosize="{ minRows: 2}"
+              maxlength="100"
+              show-word-limit
+              placeholder="请输入重点3,不能超过100字符"></el-input>          
+              </el-row>
+              <br/>
+              <el-row>
+                   <el-input v-model="textDe.point4" type="textarea" :autosize="{ minRows: 2}"
+              maxlength="100"
+              show-word-limit
+              placeholder="请输入重点4,不能超过100字符"></el-input>
+              </el-row>
+      
+              <br/>
+              <el-row>
+        <el-input v-model="textDe.point5" type="textarea" :autosize="{ minRows: 2}"
+              maxlength="50"
+              show-word-limit
+              placeholder="请输入重点5,不能超过50字符"></el-input>         
+              </el-row>
+       
+  <div slot="footer" class="dialog-footer">
+    <el-button @click="dialogFormVisible = false">取 消</el-button>
+    <el-button type="primary" @click="batchSave">保存</el-button>
+  </div>
+</el-dialog>
+  
   </section>
+
+  
 </template>
 <script>
 import { merchan,categoryApi,translateApi} from "@/api";
@@ -113,6 +177,10 @@ export default {
   },
   data() {
     return {
+      pageIndex:1,
+        pageSize:60,
+        total:0,
+      dialogFormVisible:false,
       productTypeLoading:false,
       modalShow:false,
       modalLoading:false,
@@ -120,24 +188,23 @@ export default {
       attrData:attrData,
      
         selectArr:[],
-        pageIndex:1,
-        pageSize:60,
-        total:0,
+        
         loading:false,
         selfList:false,
         regions:regions,
         categoryTypes:[],
         query:{
            merChanName:'', 
-           formatCreatTime:'',
+           formatCreatTime:this.formatDate(new Date()),
+           excelName:'',
            country:'',
-           exportTime:'',
-           isSpiderBox:false
+           isSpiderBox:true
         },
      
         
         exportQuery:{
-          excelName:''
+          id:'',
+          dateRange:[]
         },
       columns1: [
         {
@@ -211,6 +278,21 @@ export default {
         ]
       },
      formList:[],
+     textDe:{
+       description:'',
+       point1:'',
+       point2:'',
+       point3:'',
+       point4:'',
+       point5:''
+     },
+     batchDeatil:{
+       es:{},
+       uk:{},
+       de:{},
+       fr:{},
+       it:{}
+     }
     
     };
   },
@@ -225,10 +307,55 @@ export default {
     
   },
   methods: {
-   
+   async batchSave(){
+     const loading = this.$loading({
+          lock: true,
+          text: '翻译生成中..请稍后',
+          spinner: 'el-icon-loading',
+          background: 'rgba(0, 0, 0, 0.7)'
+        });
+        
+     let batchData = []
+     if(!this.selectArr.length){
+       this.$Message.error('未选中数据!')
+       this.dialogFormVisible = false
+       return
+     }
+     for(let form of this.selectArr){
+       batchData.push(this.creatNewForm(form,this.batchDeatil))
+     }
+    //  for(let country in this.batchDeatil){
+    //    if(Object.keys(this.batchDeatil[country]).length === 0) continue
+    //     for(let form of this.selectArr){
+    //       batchData.push(this.creatNewForm(form,this.batchDeatil[country]))
+    //     }
+    //  }
+    
+    batchData.forEach(el => {
+      for(let k in this.textDe){
+        if(this.textDe[k]){
+          el[k] = this.textDe[k]
+        }
+      }
+    })
+    let newList = []
+    for(let b of batchData){
+      try{
+       let data = await this.translateForm(b)
+       newList.push(JSON.parse(JSON.stringify(data)))
+      }catch(e){
+        console.log(e)
+      } 
+    }
+     await merchan.batchEdit(newList)
+     
+     this.dialogFormVisible = false
+     loading.close()
+    this.fetchData()
+   },
    creatNewForm(form,newData){
      let newForm = Object.assign({},form,newData)
-     newForm.parentSku = (form.brand + "-" + this.$uuid()).slice(0,32)
+    // newForm.parentSku = (form.brand + "-" + this.$uuid()).slice(0,32)
      if(newForm.childAttr){
        newForm.childAttr.forEach((el,index) => {
          let currentindex = index < 9 ? "0" + (index + 1) : index + 1;
@@ -237,11 +364,24 @@ export default {
      }
      return newForm
    },
+   formatDate(date) {
+      let y = date.getFullYear();
+      let m = date.getMonth() + 1;
+      let d = date.getDate();
+      m < 10 ? (m = "0" + m) : m;
+      d < 10 ? (d = "0" + d) : d;
+      return `${y}-${m}-${d}`;
+    },
+   handleDone(val){
+    // this.batchDeatil[val.country] = val
+    this.batchDeatil = val
+   },
    formatTransMain(data){
      let str  = ''
      let transArr = ['merChanName','description','point1','point2','point3','point4','point5']
      for(let key of transArr){
-       str+=`${key.toUpperCase()}=${data[key].replace(/[\ |\~|\`|\!|\@|\#|\$|\%|\^|\&|\*|\(|\)|\-|\_|\+|\=|\||\\|\[|\]|\{|\}|\;|\:|\"|\'|\,|\<|\.|\>|\/|\?]/g,',')}\n`
+       str+= `${data[key]}\n`
+      // str+=`${key.toUpperCase()}=${data[key].replace(/[\ |\~|\`|\!|\@|\#|\$|\%|\^|\&|\*|\(|\)|\-|\_|\+|\=|\||\\|\[|\]|\{|\}|\;|\:|\"|\'|\,|\<|\.|\>|\/|\?]/g,',')}\n`
      }
      return str
    },
@@ -256,7 +396,7 @@ export default {
          for(let k in child){
            if(noTransArr.indexOf(k) === -1 && k.indexOf('trans') == -1 && k.indexOf('imgurl') === -1){
              if(exArr.indexOf(child[k]) === -1){
-               str+=`${k.toUpperCase()+i}=${child[k]}\n`
+              str+=`${child[k]}\n`
                exArr.push(child[k])
              }
              
@@ -267,7 +407,86 @@ export default {
      str = str.slice(0,str.length - 1)
      return str
    },
-  
+   async translateForm(data){
+     //description
+      let noTransArr = ['sku','price','quality','imgurl','ean','size_map','model','size_name']
+     let transArr = ['merChanName','description','point1','point2','point3','point4','point5']
+     const mainStr = this.formatTransMain(data)
+     const childStr = this.formatTransChild(data)
+     if(mainStr){
+        const params = {
+                  country: data.country,
+                  query: mainStr
+                };
+              let res =  await translateApi.translate(params)
+              if(!res.data) return 
+              for(let i=0,l=res.data.length;i<l;i++){
+                const trans = res.data[i]
+                
+                if(!trans.dst.replace(/"/g,'') || !trans.src.replace(/"/g,'')){
+                  continue
+                }
+                for(let k in data){
+                  if(data[k] == trans.src){        
+                    data[k+'trans'] = trans.dst
+                  }
+                }
+                
+               
+              }
+             
+     }
+     if(childStr){
+       const params = {
+                  country: data.country,
+                  query: childStr
+                };
+              let res =  await translateApi.translate(params)
+              if(!res.data) return 
+              let transRusult = {}
+              for(let i=0,l=res.data.length;i<l;i++){
+                const trans = res.data[i]
+                
+                if(!trans.dst.replace(/"/g,'') || !trans.src.replace(/"/g,'')){
+                  continue
+                }
+                
+                const transKey = trans.src
+                const transData = trans.dst
+                transRusult[transKey] = transData
+                 
+              }
+              
+              if(data.childAttr.length){
+                    data.childAttr.forEach((el,index) => {
+                      for(let k in el){
+                        for(let notrans of noTransArr){
+                          if(k.indexOf(notrans) === -1){
+                            if(k && k.indexOf('trans') == -1 && transRusult[el[k]]){
+                          
+                          
+                          el[k+'trans'] = transRusult[el[k]]
+                         
+                        }
+                          }
+                        }
+                        
+                      }
+                    })
+                  }
+
+     }  
+                  return data
+   },
+    
+    
+   
+   
+   
+    
+      pickDate(val){
+        this.exportQuery.dateRange = val
+      },
      regionOptionsChange(val) {
       const params = {
           site: val
@@ -285,60 +504,41 @@ export default {
               this.selfList = true
           }
       },
-      async exportCsv(){
-        this.modalShow = true;
-
-      },
+      
       async submit(){
-         this.$message({
-          message: '导出表格默认只导出和第一条国家分类相同的数据,如选择数据中存在其他国家分类数据,请多次导出！',
-          type: 'warning',
-          duration:5000
-        });
-        const data  = this.selectArr
-        if(data.length == 0){
-          this.$message({
-            message:'选中数据为空!',
-            type:'error'
-          })
-          return
-        }
-        const flag = this.selectArr[0]
-        const formData = this.selectArr.filter(el => el.parentCategoryTypeId == flag.parentCategoryTypeId)
-        const uuidList = formData.map(el => el.uuid)
-        const loading = this.$loading({
+        this.$refs['exportForm'].validate(async (valid) => {
+          if(valid){
+            const params = {
+              startDate:this.exportQuery.dateRange[0],
+              endDate:this.exportQuery.dateRange[1],
+              id:this.exportQuery.id,
+              excelName:this.exportQuery.excelName
+            }
+             const loading = this.$loading({
           lock: true,
           text: '正在生成表格下载',
           spinner: 'el-icon-loading',
           background: 'rgba(0, 0, 0, 0.7)'
         });
-        const params = {
-          uuidList:uuidList,
-          id:flag.parentCategoryTypeId,
-          excelName:this.exportQuery.excelName
-        }
-        
-        
-        this.$refs['exportForm'].validate(async (valid) => {
-          if(valid){
-            let res;
-            if(!this.selfList){
-              res = await merchan.excelLoadFormAuth(params)
-            }else{
-              res = await merchan.excelLoad(params)
-            }
-            this.modalShow = false
-             if(!res.template){
+       
+            merchan.excelLoad(params).then((res) => {
+              if(!res.data.length){
+                this.$Message.error('数据为空')
+                loading.close();
+                return
+              }
+              if(!res.template){
                 this.$Message.error('模板为空')
                 loading.close();
                 return
               }
+              const data = res.data
               const template = res.template.template
               const saveName = params.excelName
               loading.close();
-              this.creatExcelLoad(formData,template,saveName)
-              this.fetchData()
-           
+              this.creatExcelLoad(data,template,saveName)
+              
+            })
           }
         })
       },
@@ -368,6 +568,7 @@ export default {
                 'feed_product_type':el.productType,
                 'item_sku':el.parentSku,
                 'brand_name':el.brand,
+                'part_number':el.parentSku,
                 'item_name':el['merChanNametrans'],
                 'recommended_browse_nodes':el.categoryType,
                 'product_description':el['descriptiontrans'],
@@ -387,9 +588,8 @@ export default {
                 'other_image_url6':el.mainImgUrl7,
                 'other_image_url7':el.mainImgUrl8,
                 'country_of_origin':'China',
-                'variation_theme':el.VariType,
                 'quantity':el.quantity||el.quality,
-                'condition_type':this.initStatusFormCountry(el.country)
+                'condition_type':el.status || this.initStatusFormCountry(el.country)
             }
             if(el.discountDate.length){
                 obj['sale_price'] = el.discountPrice
@@ -402,9 +602,10 @@ export default {
                     obj['parent_child'] = 'Parent'
                     let children = Object.assign({},obj,child)
                     children['item_sku'] = child.sku
+                    children['part_number'] = child.sku
                     children['quantity'] = child.quantity || child.quality
                     children['external_product_id'] = child.ean
-                    children['external_product_id_type'] = 'UPC'
+                    children['external_product_id_type'] = 'EAN'
                     children['model'] = child.model
                     children['parent_child'] = 'Child'
                     children['parent_sku'] = obj['item_sku']
@@ -418,8 +619,6 @@ export default {
                     children['other_image_url1'] = child.imgurl6 || el.mainImgUrl6
                     children['other_image_url1'] = child.imgurl7 || el.mainImgUrl7
                     children['standard_price'] = child.price
-                    children['size_map'] = child['size_nametrans'] || ''
-                    children['color_map'] = child['color_nametrans'] || ''
                     current.push(children)
                 })
             }else{
@@ -434,18 +633,8 @@ export default {
     },
     renderExcel(merchants,template){
     const table = template
-
-    let colStyle = []
-    let filterCow = {}
-    for(let key in table){
-      let cellName = key.slice(0,key.length - 1)
-      if(!filterCow[cellName] && cellName.indexOf('!') == -1){
-        filterCow[cellName] = 1
-      }
-    }
-    for(let key in filterCow){
-      colStyle.push({wpx:100})
-    }
+    
+    
     for(let i=0,l=merchants.length;i<l;i++){
         for(let k in merchants[i]){
             for(let key in table){
@@ -454,14 +643,21 @@ export default {
                     let cell = key.slice(0,key.length - 1)
                     table[cell+index] = {
                         t:'s',
-                        v:merchants[i][k] || ''
+                        v:merchants[i][k] || '',
+                        h:merchants[i][k] || '',
+                        w:merchants[i][k] || ''
                     }
+                  
+                  
+                    
                 }else if(table[key].v == k && merchants[i][k+'trans']){
 									let index = Number(key.slice(-1))+i+1
                     let cell = key.slice(0,key.length - 1)
                     table[cell+index] = {
                         t:'s',
-                        v:merchants[i][k+'trans'] || ''
+                        v:merchants[i][k+'trans'] || '',
+                        h:merchants[i][k+'trans'] || '',
+                        w:merchants[i][k+'trans'] || ''
                     }
 								}
             }
@@ -469,8 +665,11 @@ export default {
         
     }
     const oldRef = table['!ref']
-   
-     table['!cols'] = colStyle
+    const colsStyle = []
+    for(let tr in table){
+      colsStyle.push({wch:50})
+    }
+    table['!cols'] = colsStyle
     table['!ref'] = oldRef.slice(0,oldRef.length - 1)+(Number(oldRef.slice(-1))+merchants.length)
     const wb = xlsx.utils.book_new();
     const renderTable = Object.assign({},table)
@@ -520,19 +719,11 @@ creatExcelLoad(data,template,saveName){
               name:'商品编辑',
               query:{
                   edit:true,
-                  show:true
+                  spiderEdit:true
               }
           })
           
       },
-      formatDate(date) {
-      let y = date.getFullYear();
-      let m = date.getMonth() + 1;
-      let d = date.getDate();
-      m < 10 ? (m = "0" + m) : m;
-      d < 10 ? (d = "0" + d) : d;
-      return `${y}-${m}-${d}`;
-    },
       async bathDel(){
           const promiseArr = this.selectArr.map(el => {
               let params = {
@@ -547,62 +738,38 @@ creatExcelLoad(data,template,saveName){
       bathSelect(val){
           this.selectArr = val
       },
-      addNew(){
-          this.$router.push({
-              name:'商品编辑',
-              newEdit:true
-          })
-      },
       handleSizeChange(val){
-        
         this.pageSize = val
         this.fetchData()
       },
       handleCurrentChange(val){
-        
         this.pageIndex = val
         this.fetchData()
       },
     fetchData(){
-      
-        const param = this.$route.query
-        this.getMerList(param.user,param.auth)
+        this.getMerList()
     },
     async getMerList(user,auth){
         this.loading = true
         let query = {}
+
         for(let k in this.query){
-            if(this.query[k] !=='' && this.query[k] !== null){
+           
+            if(this.query[k] !== '' && this.query[k] !== null){
                 query[k] = this.query[k]
             }
         }
-        if(auth){
-            const param = {
-                query:{
-                    user:user
-                },
-                pageSize:this.pageSize,
-                pageIndex:this.pageIndex
-            }
-            param.query = Object.assign(param.query,query)
-            merchan.getMerListFromAuth(param).then((res) => {
-                this.formList = res.data.data
-                this.total = res.data.count
-                this.loading = false
-            })
-        }else{
             const param = {
                 query:query,
-                 pageSize:this.pageSize,
+                pageSize:this.pageSize,
                 pageIndex:this.pageIndex
-                
             }
             merchan.getMerList(param).then((res) => {
                 this.formList = res.data.data
                 this.total = res.data.count
                 this.loading = false
             })
-        }
+        
     }
   }
 };

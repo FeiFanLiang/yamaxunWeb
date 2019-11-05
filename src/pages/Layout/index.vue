@@ -43,7 +43,11 @@
                        
                     </Breadcrumb>
                     <Content :style="{padding: '24px', minHeight: '280px', background: '#fff'}">
-												<router-view></router-view>
+													<keep-alive>
+														<router-view v-if="$route.meta.keepAlive"></router-view>
+													</keep-alive>
+														<router-view v-if="!$route.meta.keepAlive"></router-view>
+												
                     </Content>
                 </Layout>
             </Layout>
@@ -65,6 +69,8 @@ export default {
       }),
 			
 		router(){
+			
+			
 			return this.$router.options.routes.filter(el =>  el.meta && !el.meta.hidden)
 		},
 		breadRoutes(){

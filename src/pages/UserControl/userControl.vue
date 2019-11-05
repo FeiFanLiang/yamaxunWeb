@@ -43,6 +43,9 @@
           <Form-Item label="品牌名称" prop="brand">
             <Input v-model="newUser.brand" type="text" placeholder="品牌"></Input>
           </Form-Item>
+          <Form-Item label="ean前缀" prop="eanPre">
+            <Input v-model="newUser.eanPre" type="text" placeholder="ean前缀"></Input>
+          </Form-Item>
           <Form-Item label="用户等级" prop="role">
             <Select v-model="newUser.role">
               <Option v-for="(item,index) of currentUserCreatRole" :label="item.label" :value="item.value" :key="index"></Option>
@@ -95,7 +98,8 @@
           username:"",
           password:'',
           brand:'',
-          role:''
+          role:'',
+          eanPre:''
         },
         editUser:{
           username:'',
@@ -105,6 +109,16 @@
           auth:true
         },
           validRules: {
+            eanPre:[
+              {required:true,message:'请输入7位数前缀',trigger:'blur'},
+              {
+                type:'string',
+                min:7,
+                max:7,
+                message:'请输入7位数前缀',
+                trigger:'blur'
+              }
+            ],
             username:[
               {required:true,message:"请输入用户名",trigger:'blur'},
               {
@@ -192,7 +206,7 @@
     methods: {
       merListFromAuth(row){
         this.$router.push({
-          name:'我的商品',
+          name:'商品列表',
           query:{
             user:row.username,
             auth:true

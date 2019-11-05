@@ -1,7 +1,9 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Layout from '@/pages/Layout'
-
+import myCommitPage from '@/pages/Merchan/merchan'
+import spiderBox from '@/pages/Merchan/spiderbox'
+import sku from '@/pages/Merchan/sku'
 Vue.use(Router)
 
 export default new Router({
@@ -46,14 +48,15 @@ export default new Router({
             meta: {
                 auth: true
             },
-            redirect: '/merchan/myCommit',
+            //redirect: '/merchan/myCommit',
             component: Layout,
             children: [{
-                    name: '我的商品',
+                    name: '我的采集箱',
                     path: 'myCommit',
-                    meta: {},
-                    component: () =>
-                        import ('@/pages/Merchan/merchan')
+                    meta: {
+
+                    },
+                    component: spiderBox
                 },
                 {
                     name: '商品编辑',
@@ -63,12 +66,26 @@ export default new Router({
                         import ('@/pages/Newchan/chanEditPage')
                 },
                 {
-                    name: 'test',
-                    path: 'test',
+                    name: '商品列表',
+                    path: 'merList',
                     meta: {},
-                    component: () =>
-                        import ('@/pages/Newchan/common/batchEdit')
+                    component: myCommitPage
+                },
+                {
+                    name: '链接查询',
+                    path: 'link',
+                    meta: {
+                        level: [5]
+                    },
+                    component: sku
                 }
+                // {
+                //     name: 'test',
+                //     path: 'test',
+                //     meta: {},
+                //     component: () =>
+                //         import ('@/pages/Newchan/common/batchEdit')
+                // }
             ]
         },
         {

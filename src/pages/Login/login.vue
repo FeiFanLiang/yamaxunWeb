@@ -86,6 +86,20 @@
             </FormItem>
           </Col>
         </Row>
+        <Row type="flex" justify="center">
+          <Col span="16">
+            <FormItem prop="eanPre">
+              <Input
+                size="large"
+                placeholder="您的EAN前缀"
+                type="text"
+                prefix="ios-lock-outline"
+                clearable
+                v-model.trim="newUserForm.eanPre"
+              ></Input>
+            </FormItem>
+          </Col>
+        </Row>
       </Form>
       <div class="form_submit">
         <Button type="success" long @click="regist('newUserForm')">注册</Button>
@@ -108,7 +122,8 @@ export default {
       newUserForm: {
         username: "",
         password: "",
-        brand: ""
+        brand: "",
+        eanPre:''
       },
       new_rules: {
         username: [

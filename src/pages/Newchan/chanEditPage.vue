@@ -2,7 +2,165 @@
   <section>
     <el-form :model="form" ref="form" label-width="90px" size="mini" :rules="rules">
       <el-tabs v-model="activeName">
-        <el-tab-pane label="基础信息" name="first">
+       
+        <el-tab-pane label="变种信息" name="first">
+          <div class="attrContainer">
+            <div v-if="$route.query.newEdit">
+              <h3>变种列表</h3>
+              <attrDetail
+                v-if="attrPickShow"
+                :parentSku="form.parentSku"
+                :baseDetail="currentCategoryAttr"
+                :VariType="form.VariType"
+                :attrList="form.childAttr"
+                
+                @childChange="handleChidChange"
+                @pickedAttr="handleVariType"
+              ></attrDetail>
+            </div>
+            <div>
+              <childList :formData="form.childAttr"></childList>
+            </div>
+            <div v-if=" form.spiderChild.length && $route.query.spiderEdit">
+              <h3>采集变种信息</h3>
+              <spiderAttrEdit
+                @editCallback="reSpiderChild"
+                :parentSku="form.parentSku"
+                :formData="form.spiderChild"
+              ></spiderAttrEdit>
+            </div>
+          </div>
+        </el-tab-pane>
+        <el-tab-pane label="图片信息" name="second">
+          
+           <div>
+		  	 <el-row type="flex" align="bottom" class="row-bg">
+              <el-col :span="2">
+                <div class="imgWrap">
+                  <img :src="form.mainImgUrl1" alt />
+                </div>
+              </el-col>
+              <el-col :span="8">
+                <el-input v-model="form.mainImgUrl1">
+                  <template slot="prepend">主图链接1</template>
+                </el-input>
+              </el-col>
+            </el-row>
+			<el-divider></el-divider>
+		  </div>
+           <div>
+		  	 <el-row type="flex" align="bottom" class="row-bg">
+              <el-col :span="2">
+                <div class="imgWrap">
+                  <img :src="form.mainImgUrl2" alt />
+                </div>
+              </el-col>
+              <el-col :span="8">
+                <el-input v-model="form.mainImgUrl2">
+                  <template slot="prepend">主图链接2</template>
+                </el-input>
+              </el-col>
+            </el-row>
+			<el-divider></el-divider>
+		  </div>
+            
+          
+          <div>
+		  	 <el-row type="flex" align="bottom" class="row-bg">
+              <el-col :span="2">
+                <div class="imgWrap">
+                  <img :src="form.mainImgUrl3" alt />
+                </div>
+              </el-col>
+              <el-col :span="8">
+                <el-input v-model="form.mainImgUrl3">
+                  <template slot="prepend">主图链接3</template>
+                </el-input>
+              </el-col>
+            </el-row>
+			<el-divider></el-divider>
+		  </div>
+       <div>
+		  	 <el-row type="flex" align="bottom" class="row-bg">
+              <el-col :span="2">
+                <div class="imgWrap">
+                  <img :src="form.mainImgUrl4" alt />
+                </div>
+              </el-col>
+              <el-col :span="8">
+                <el-input v-model="form.mainImgUrl4">
+                  <template slot="prepend">主图链接4</template>
+                </el-input>
+              </el-col>
+            </el-row>
+			<el-divider></el-divider>
+		  </div>
+
+          <div>
+		  	 <el-row type="flex" align="bottom" class="row-bg">
+              <el-col :span="2">
+                <div class="imgWrap">
+                  <img :src="form.mainImgUrl5" alt />
+                </div>
+              </el-col>
+              <el-col :span="8">
+                <el-input v-model="form.mainImgUrl5">
+                  <template slot="prepend">主图链接5</template>
+                </el-input>
+              </el-col>
+            </el-row>
+			<el-divider></el-divider>
+		  </div>
+           <div>
+		  	 <el-row type="flex" align="bottom" class="row-bg">
+              <el-col :span="2">
+                <div class="imgWrap">
+                  <img :src="form.mainImgUrl6" alt />
+                </div>
+              </el-col>
+              <el-col :span="8">
+                <el-input v-model="form.mainImgUrl6">
+                  <template slot="prepend">主图链接6</template>
+                </el-input>
+              </el-col>
+            </el-row>
+			<el-divider></el-divider>
+		  </div>
+          <div>
+		  	 <el-row type="flex" align="bottom" class="row-bg">
+              <el-col :span="2">
+                <div class="imgWrap">
+                  <img :src="form.mainImgUrl7" alt />
+                </div>
+              </el-col>
+              <el-col :span="8">
+                <el-input v-model="form.mainImgUrl7">
+                  <template slot="prepend">主图链接7</template>
+                </el-input>
+              </el-col>
+            </el-row>
+			<el-divider></el-divider>
+		  </div>
+           <div>
+		  	 <el-row type="flex" align="bottom" class="row-bg">
+              <el-col :span="2">
+                <div class="imgWrap">
+                  <img :src="form.mainImgUrl8" alt />
+                </div>
+              </el-col>
+              <el-col :span="8">
+                <el-input v-model="form.mainImgUrl8">
+                  <template slot="prepend">主图链接8
+                   </template>
+                </el-input>
+              </el-col>
+            </el-row>
+			<el-divider></el-divider>
+		  </div>
+         
+        </el-tab-pane>
+     
+         <el-tab-pane label="基础信息" name="third">
           <el-form-item label="品牌信息" prop="brand" style="width:300px">
             <el-input v-model="form.brand" disabled></el-input>
           </el-form-item>
@@ -45,7 +203,7 @@
             </el-radio-group>
           </el-form-item>
           <el-form-item label="SKU" prop="parentSku">
-            <el-input style="width:800px" v-model="form.parentSku"></el-input>
+            <el-input style="width:800px" v-model="form.parentSku" disabled></el-input>
           </el-form-item>
           <el-form-item label="产品名称" prop="merChanName">
             <el-input style="width:800px" v-model="form.merChanName"></el-input>
@@ -56,7 +214,7 @@
           <el-form-item label="产品数量" prop="quantity">
             <el-input style="width:800px" v-model.number="form.quantity"></el-input>
           </el-form-item>
-          <el-form-item label="产品价格" prop="price" v-if="form.hasVarieta">
+          <el-form-item label="产品价格" v-if="form.hasVarieta">
             <el-input v-model="form.price" style="width:800px" placeholder="商品价格,保留两位小数"></el-input>
           </el-form-item>
           <el-form-item label="关键词" prop="keyword">
@@ -76,9 +234,9 @@
               type="textarea"
               style="width:800px"
               :autosize="{ minRows: 2}"
-              maxlength="2000"
+              maxlength="1500"
               show-word-limit
-              placeholder="请输入关键词,不能超过2000字符"
+              placeholder="请输入关键词,不能超过1500字符"
             ></el-input>
           </el-form-item>
           <el-form-item label="重点描述1" prop="point1">
@@ -87,9 +245,9 @@
               type="textarea"
               style="width:800px"
               :autosize="{ minRows: 2}"
-              maxlength="500"
+              maxlength="100"
               show-word-limit
-              placeholder="请输入重点描述,不能超过500字符"
+              placeholder="请输入重点描述,不能超过100字符"
             ></el-input>
           </el-form-item>
           <el-form-item label="重点描述2" prop="point2">
@@ -98,9 +256,9 @@
               type="textarea"
               style="width:800px"
               :autosize="{ minRows: 2}"
-              maxlength="500"
+              maxlength="100"
               show-word-limit
-              placeholder="请输入重点描述,不能超过500字符"
+              placeholder="请输入重点描述,不能超过100字符"
             ></el-input>
           </el-form-item>
           <el-form-item label="重点描述3" prop="point3">
@@ -109,9 +267,9 @@
               type="textarea"
               style="width:800px"
               :autosize="{ minRows: 2}"
-              maxlength="500"
+              maxlength="100"
               show-word-limit
-              placeholder="请输入重点描述,不能超过500字符"
+              placeholder="请输入重点描述,不能超过100字符"
             ></el-input>
           </el-form-item>
           <el-form-item label="重点描述4" prop="point4">
@@ -120,9 +278,9 @@
               type="textarea"
               style="width:800px"
               :autosize="{ minRows: 2}"
-              maxlength="500"
+              maxlength="100"
               show-word-limit
-              placeholder="请输入重点描述,不能超过500字符"
+              placeholder="请输入重点描述,不能超过100字符"
             ></el-input>
           </el-form-item>
           <el-form-item label="重点描述5" prop="point5">
@@ -131,9 +289,9 @@
               type="textarea"
               style="width:800px"
               :autosize="{ minRows: 2}"
-              maxlength="500"
+              maxlength="50"
               show-word-limit
-              placeholder="请输入重点描述,不能超过500字符"
+              placeholder="请输入重点描述,不能超过50字符"
             ></el-input>
           </el-form-item>
           <el-form-item label="发布日期" prop="date">
@@ -145,203 +303,13 @@
               placeholder="选择日期"
             ></el-date-picker>
           </el-form-item>
-          <el-row>
-            <el-button type="primary" @click="submit">提交</el-button>
-          </el-row>
+          
         </el-tab-pane>
-        <el-tab-pane label="变种信息" name="second">
-          <div class="attrContainer">
-            <div>
-              <h3>变种列表</h3>
-              <attrDetail
-                v-if="attrPickShow"
-                :parentSku="form.parentSku"
-                :baseDetail="currentCategoryAttr"
-                :VariType="form.VariType"
-                :attrList="form.childAttr"
-                
-                @childChange="handleChidChange"
-                @pickedAttr="handleVariType"
-              ></attrDetail>
-            </div>
-            <div v-if="form.spiderChild.length">
-              <h3>采集变种信息</h3>
-              <spiderAttrEdit
-                @editCallback="reSpiderChild"
-                :parentSku="form.parentSku"
-                :formData="form.spiderChild"
-              ></spiderAttrEdit>
-            </div>
-          </div>
-        </el-tab-pane>
-        <el-tab-pane label="图片信息" name="third">
-          <el-form-item label="主图链接1">
-          <el-row :gutter="20">
-            <el-col :span="16">
-              <el-input v-model="form.mainImgUrl1" placeholder="主图片1链接"></el-input>
-            </el-col>
-            <el-col :span="6">
-              <el-tooltip class="item" effect="dark"  placement="top">
-               <div slot="content">
-                <div class="imgWrap">
-                <img :src="form.mainImgUrl1" alt="">
-                </div>
-               </div>
-      <el-button>图片预览</el-button>
-    </el-tooltip>
-            </el-col>
-          </el-row>
-            
-          </el-form-item>
-         <el-form-item label="主图链接2">
-          <el-row :gutter="20">
-            <el-col :span="16">
-              <el-input v-model="form.mainImgUrl2" placeholder="主图片2链接"></el-input>
-            </el-col>
-            <el-col :span="6">
-              <el-tooltip class="item" effect="dark"  placement="top">
-               <div slot="content">
-                <div class="imgWrap">
-                <img :src="form.mainImgUrl2" alt="">
-                </div>
-               </div>
-      <el-button>图片预览</el-button>
-    </el-tooltip>
-            </el-col>
-          </el-row>
-            
-          </el-form-item>
-          <el-form-item label="主图链接2">
-          <el-row :gutter="20">
-            <el-col :span="16">
-              <el-input v-model="form.mainImgUrl2" placeholder="主图片2链接"></el-input>
-            </el-col>
-            <el-col :span="6">
-              <el-tooltip class="item" effect="dark"  placement="top">
-               <div slot="content">
-                <div class="imgWrap">
-                <img :src="form.mainImgUrl2" alt="">
-                </div>
-               </div>
-      <el-button>图片预览</el-button>
-    </el-tooltip>
-            </el-col>
-          </el-row>
-            
-          </el-form-item>
-          <el-form-item label="主图链接3">
-          <el-row :gutter="20">
-            <el-col :span="16">
-              <el-input v-model="form.mainImgUrl3" placeholder="主图片3链接"></el-input>
-            </el-col>
-            <el-col :span="6">
-              <el-tooltip class="item" effect="dark"  placement="top">
-               <div slot="content">
-                <div class="imgWrap">
-                <img :src="form.mainImgUrl3" alt="">
-                </div>
-               </div>
-      <el-button>图片预览</el-button>
-    </el-tooltip>
-            </el-col>
-          </el-row>
-            
-          </el-form-item>
-          <el-form-item label="主图链接4">
-          <el-row :gutter="20">
-            <el-col :span="16">
-              <el-input v-model="form.mainImgUrl4" placeholder="主图片4链接"></el-input>
-            </el-col>
-            <el-col :span="6">
-              <el-tooltip class="item" effect="dark"  placement="top">
-               <div slot="content">
-                <div class="imgWrap">
-                <img :src="form.mainImgUrl4" alt="">
-                </div>
-               </div>
-      <el-button>图片预览</el-button>
-    </el-tooltip>
-            </el-col>
-          </el-row>
-            
-          </el-form-item>
-          <el-form-item label="主图链接5">
-          <el-row :gutter="20">
-            <el-col :span="16">
-              <el-input v-model="form.mainImgUrl5" placeholder="主图片5链接"></el-input>
-            </el-col>
-            <el-col :span="6">
-              <el-tooltip class="item" effect="dark"  placement="top">
-               <div slot="content">
-                <div class="imgWrap">
-                <img :src="form.mainImgUrl5" alt="">
-                </div>
-               </div>
-      <el-button>图片预览</el-button>
-    </el-tooltip>
-            </el-col>
-          </el-row>
-            
-          </el-form-item>
-          <el-form-item label="主图链接6">
-          <el-row :gutter="20">
-            <el-col :span="16">
-              <el-input v-model="form.mainImgUrl6" placeholder="主图片6链接"></el-input>
-            </el-col>
-            <el-col :span="6">
-              <el-tooltip class="item" effect="dark"  placement="top">
-               <div slot="content">
-                <div class="imgWrap">
-                <img :src="form.mainImgUrl6" alt="">
-                </div>
-               </div>
-      <el-button>图片预览</el-button>
-    </el-tooltip>
-            </el-col>
-          </el-row>
-            
-          </el-form-item>
-          <el-form-item label="主图链接7">
-          <el-row :gutter="20">
-            <el-col :span="16">
-              <el-input v-model="form.mainImgUrl7" placeholder="主图片7链接"></el-input>
-            </el-col>
-            <el-col :span="6">
-              <el-tooltip class="item" effect="dark"  placement="top">
-               <div slot="content">
-                <div class="imgWrap">
-                <img :src="form.mainImgUrl7" alt="">
-                </div>
-               </div>
-      <el-button>图片预览</el-button>
-    </el-tooltip>
-            </el-col>
-          </el-row>
-            
-          </el-form-item>
-          <el-form-item label="主图链接8">
-          <el-row :gutter="20">
-            <el-col :span="16">
-              <el-input v-model="form.mainImgUrl8" placeholder="主图片8链接"></el-input>
-            </el-col>
-            <el-col :span="6">
-              <el-tooltip class="item" effect="dark"  placement="top">
-               <div slot="content">
-                <div class="imgWrap">
-                <img :src="form.mainImgUrl8" alt="">
-                </div>
-               </div>
-      <el-button>图片预览</el-button>   
-    </el-tooltip>
-            </el-col>
-          </el-row>
-            
-          </el-form-item>
-        </el-tab-pane>
-        <el-tab-pane label="图片管理" name="four">
+           <el-tab-pane label="图片管理" name="fourth">
           <el-upload
   action="http://www.amazonvvip.com/api/uploadImg"
   list-type="picture-card"
+  multiple
   :file-list="newImg"
   :on-preview="handlePictureCardPreview"
   :on-remove="handleRemove"
@@ -352,11 +320,15 @@
   <img width="100%" :src="dialogImageUrl">
 </el-dialog>
 <div class="urlList">
-<span v-for="(item,index) of newImg" :key="index">上传图片链接{{index+1}}: {{item.response.data.url}}</span>
+<span v-for="(item,index) of newImg" :key="index">上传图片链接{{index+1}}: {{ item.response && item.response.data && item.response.data.url}}</span>
 </div>
         </el-tab-pane>
       </el-tabs>
     </el-form>
+    <el-divider></el-divider>
+    <el-row>
+            <el-button type="primary" @click="submit">保存</el-button>
+          </el-row>
   </section>
 </template>
 <script>
@@ -367,8 +339,9 @@ import countrySelect from "./common/countrySelect";
 import { regions, attrData } from "@/common/options.js";
 import { categoryApi, merchan, translateApi } from "@/api";
 import { mapState } from "vuex";
+import childList from './common/childList'
 export default {
-  components: { countrySelect, categoryTypeNode, attrDetail, spiderAttrEdit },
+  components: { childList,countrySelect, categoryTypeNode, attrDetail, spiderAttrEdit },
   data() {
     return {
       imgDialog:false,
@@ -584,10 +557,10 @@ export default {
   },
   methods: {
     handleUpload(response,file,fileList){
-      
       if(response.code == 1){
         this.$message.success('图片上传成功')
         this.newImg = fileList
+        
       }
       
     },
@@ -639,40 +612,34 @@ export default {
           });
           if (this.$route.query.edit) {
            
-              
             
-            merchan
-              .updateMer(this.form)
-              .then(res => {
-                if (res.code == 1) {
-                  this.$Message.success("发布成功");
-                  loading.close();
-                } else {
-                  this.$Message.error("发布失败");
-                  loading.close();
-                }
-              })
-              .catch(() => {
-                this.$Message.error("发布失败");
-                loading.close();
-              });
+            try{
+              let res = await merchan.updateMer(this.form)
+              if(res.code == 1){
+                this.$Message.success("编辑成功");
+                this.$router.go(-1)
+              }
+            }catch(e){
+              this.$Message.error("编辑失败");
+            }finally{
+              loading.close();
+            }
+           
           } else {
             
-            merchan
-              .addMer(this.form)
-              .then(res => {
-                if (res.code == 1) {
-                  this.$Message.success("发布成功");
-                  loading.close();
-                } else {
-                  this.$Message.error("发布失败");
-                  loading.close();
-                }
-              })
-              .catch(() => {
-                this.$Message.error("发布失败");
-                loading.close();
-              });
+
+            try{
+              let res = await merchan.addMer(this.form)
+              if(res.code == 1){
+                this.$Message.success("发布成功");
+                this.$router.go(-1)
+              }
+
+            }catch(e){
+              this.$Message.error("发布失败");
+            }finally{
+              loading.close()
+            }
           }
         } else {
           this.$Message.error("字段填写错误！");
@@ -681,6 +648,7 @@ export default {
       });
     },
     checkQuery() {
+    
       if (this.$route.query.edit) {
         const form = JSON.parse(sessionStorage.getItem("currentMer"));
         this.form = Object.assign({}, this.form, form);
@@ -693,6 +661,9 @@ export default {
     reSpiderChild(data) {
       this.form.childAttr = data;
       this.attrPickShow = true
+      this.$Message.success('变体信息保存成功,已经生成变种子列表')
+      
+
     },
     formatDate(date) {
       let y = date.getFullYear();
@@ -809,8 +780,8 @@ export default {
       padding: 40px;
     }
     .imgWrap{
-      width: 200px;
-      height: 200px;
+      width: 150px;
+      height: 150px;
       margin-bottom: 15px;
       margin-right: 15px;
     }
@@ -819,5 +790,9 @@ export default {
       width: 100%;
       height: 100%;
     }
-   
+  
+   .urlList{
+     display: flex;
+     flex-direction: column;
+   }
 </style>

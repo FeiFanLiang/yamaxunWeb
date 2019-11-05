@@ -66,7 +66,7 @@
         </Row>
          <Row>
           <Form-Item label="EAN前缀" prop="eanPre">
-            <Input type="text" v-model="form.eanPre" placeholder="请输入新的3位数EAN前缀"></Input>
+            <Input type="text" v-model="form.eanPre" placeholder="请输入新的7位数EAN前缀(国家名称3位+厂家4位)"></Input>
           </Form-Item>
         </Row>
         </template>
@@ -152,8 +152,8 @@
             },
             {
               type:'string',
-              min:3,
-              max:3
+              min:7,
+              max:7
             }
           ]
         }

@@ -39,9 +39,16 @@ export default {
     },
     async excelLoad(params) {
         return axios({
-            method: 'get',
+            method: 'post',
             url: '/excel',
-            params
+            data: params
+        })
+    },
+    async excelLoadFormAuth(params) {
+        return axios({
+            method: 'post',
+            url: '/excelFormAuth',
+            data: params
         })
     },
     async batchEdit(params) {
@@ -49,6 +56,13 @@ export default {
             method: 'post',
             url: '/batchEdit',
             data: params
+        })
+    },
+    async linkSearch(params) {
+        return axios({
+            method: 'get',
+            url: '/linkSearch',
+            params
         })
     }
 }

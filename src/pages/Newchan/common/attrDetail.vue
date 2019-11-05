@@ -26,7 +26,7 @@
             class="input-new-tag"
              v-model="input[item.attributeName]"
             :ref="item.attributeName+index"
-            size="small"
+            size="small" 
             @keyup.enter.native="handleInputConfirm(item,$event)"
             @blur="handleInputConfirm(item,$event)"
           ></el-input>
@@ -44,34 +44,7 @@
           </el-col>
         </el-row>
     </template>
-		<template v-if="formData.length">
-		
-				<el-table :data="formData" border stripe size="mini">
-					<template v-for="(value,key) in formData[0]">
-            <template v-if="key !== 'ean' && key !== 'sku' && key.indexOf('trans') == -1">
-              	<el-table-column :label="translateColumnLabel(key)" :key="key" align="center">
-							<template slot-scope="scope">
-								<el-input size="mini" :disabled="editAble(key)" v-model="scope.row[key]" clearable @change="emitForm"></el-input>
-							</template>
-						</el-table-column>
-            </template>
-					</template>
-					<el-table-column label="操作">
-						<template slot-scope="scope">
-							<el-button type="danger" size="mini" @click="removeChild(scope.$index)">移除</el-button>
-               <el-tooltip class="item" effect="dark"  placement="top">
-               <div slot="content">
-                <div class="imgWrap">
-                <img :src="scope.row.imgurl" alt="">
-                </div>
-               </div>
-      
-    </el-tooltip>
-						</template>
-					</el-table-column>
-          
-				</el-table>
-		</template>
+	
   </section>
 </template>
 <script>
